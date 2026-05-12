@@ -1,4 +1,4 @@
-const JYS = window.JYS = window.JYS || {};
+var JYS = window.JYS = window.JYS || {};
 
 JYS.App = {
   globalData: {
@@ -13,11 +13,13 @@ JYS.App = {
     this.checkScreenSize();
     window.addEventListener('resize', function() { self.checkScreenSize(); });
 
-    var authExpire = localStorage.getItem('auth_expire');
-    if (authExpire && Date.now() < parseInt(authExpire)) {
-      this.globalData.isAuth = true;
-      this.globalData.authExpireTime = parseInt(authExpire);
-    }
+    try {
+      var authExpire = localStorage.getItem('auth_expire');
+      if (authExpire && Date.now() < parseInt(authExpire)) {
+        this.globalData.isAuth = true;
+        this.globalData.authExpireTime = parseInt(authExpire);
+      }
+    } catch (e) {}
 
     window.addEventListener('hashchange', function() { self.route(); });
     this.route();
@@ -25,7 +27,9 @@ JYS.App = {
 
   checkScreenSize: function() {
     this.globalData.isMobile = window.innerWidth < 768;
-    document.body.className = this.globalData.isMobile ? 'mobile' : 'desktop';
+    if (document.body) {
+      document.body.className = this.globalData.isMobile ? 'mobile' : 'desktop';
+    }
   },
 
   requireAuth: function() {
@@ -37,12 +41,14 @@ JYS.App = {
   },
 
   checkAuth: function() {
-    var authExpire = localStorage.getItem('auth_expire');
-    if (authExpire && Date.now() < parseInt(authExpire)) {
-      this.globalData.isAuth = true;
-      this.globalData.authExpireTime = parseInt(authExpire);
-      return true;
-    }
+    try {
+      var authExpire = localStorage.getItem('auth_expire');
+      if (authExpire && Date.now() < parseInt(authExpire)) {
+        this.globalData.isAuth = true;
+        this.globalData.authExpireTime = parseInt(authExpire);
+        return true;
+      }
+    } catch (e) {}
     this.globalData.isAuth = false;
     return false;
   },
@@ -52,13 +58,13 @@ JYS.App = {
     var expireTime = Date.now() + expireMinutes * 60 * 1000;
     this.globalData.isAuth = true;
     this.globalData.authExpireTime = expireTime;
-    localStorage.setItem('auth_expire', expireTime);
+    try { localStorage.setItem('auth_expire', expireTime); } catch (e) {}
   },
 
   clearAuth: function() {
     this.globalData.isAuth = false;
     this.globalData.authExpireTime = 0;
-    localStorage.removeItem('auth_expire');
+    try { localStorage.removeItem('auth_expire'); } catch (e) {}
   },
 
   route: function() {

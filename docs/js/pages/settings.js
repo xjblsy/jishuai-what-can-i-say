@@ -79,24 +79,68 @@ JYS.Pages.settings = function(params) {
       document.getElementById('exportData').addEventListener('click', function() {
         U.showConfirm('导出数据', '将导出所有人物、语录和标签数据到剪贴板，请妥善保管。', '确认导出', '取消').then(function() {
           var data = S.exportAllData();
-          navigator.clipboard.writeText(data).then(function() {
-            U.showToast('已复制到剪贴板，请粘贴保存', 'success');
-          }).catch(function() { U.showToast('复制失败', 'error'); });
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(data).then(function() {
+              U.showToast('已复制到剪贴板，请粘贴保存', 'success');
+            }).catch(function() { fallbackExport(data); });
+          } else { fallbackExport(data); }
         }).catch(function() {});
       });
 
+      function fallbackExport(data) {
+        var overlay = document.createElement('div');
+        overlay.className = 'modal-overlay active';
+        overlay.innerHTML =
+          '<div class="modal-content confirm-modal">' +
+          '<div class="modal-title">导出数据</div>' +
+          '<div class="modal-body">请手动复制以下内容保存：</div>' +
+          '<textarea readonly style="width:100%;height:200px;font-size:12px;border:1px solid #ddd;border-radius:8px;padding:12px;resize:none;font-family:monospace">' + JYS.Util.escapeHtml(data) + '</textarea>' +
+          '<div class="modal-buttons"><button class="modal-btn confirm close-export">关闭</button></div></div>';
+        document.getElementById('modal-container').appendChild(overlay);
+        overlay.querySelector('.close-export').addEventListener('click', function() { overlay.parentNode.removeChild(overlay); });
+        overlay.querySelector('textarea').select();
+      }
+
       document.getElementById('importData').addEventListener('click', function() {
         U.showConfirm('导入数据', '将从剪贴板读取备份数据并导入。注意：导入将覆盖现有数据。', '确认导入', '取消').then(function() {
-          navigator.clipboard.readText().then(function(text) {
-            if (!text) { U.showToast('剪贴板为空', 'error'); return; }
-            try {
-              S.importData(text);
-              U.showToast('导入成功', 'success');
-              JYS.App.navigateTo('/settings');
-            } catch (e) { U.showToast(e.message || '导入失败', 'error'); }
-          }).catch(function() { U.showToast('无法读取剪贴板', 'error'); });
+          if (navigator.clipboard && navigator.clipboard.readText) {
+            navigator.clipboard.readText().then(function(text) {
+              if (!text) { fallbackImport(); return; }
+              tryImport(text);
+            }).catch(function() { fallbackImport(); });
+          } else { fallbackImport(); }
         }).catch(function() {});
       });
+
+      function fallbackImport() {
+        var overlay = document.createElement('div');
+        overlay.className = 'modal-overlay active';
+        overlay.innerHTML =
+          '<div class="modal-content confirm-modal">' +
+          '<div class="modal-title">导入数据</div>' +
+          '<div class="modal-body">请将备份数据粘贴到下方：</div>' +
+          '<textarea id="importTextarea" placeholder="请粘贴备份数据..." style="width:100%;height:200px;font-size:12px;border:1px solid #ddd;border-radius:8px;padding:12px;resize:none;font-family:monospace"></textarea>' +
+          '<div class="modal-buttons">' +
+          '<button class="modal-btn cancel close-import">取消</button>' +
+          '<button class="modal-btn confirm do-import">确认导入</button>' +
+          '</div></div>';
+        document.getElementById('modal-container').appendChild(overlay);
+        overlay.querySelector('.close-import').addEventListener('click', function() { overlay.parentNode.removeChild(overlay); });
+        overlay.querySelector('.do-import').addEventListener('click', function() {
+          var text = overlay.querySelector('#importTextarea').value;
+          overlay.parentNode.removeChild(overlay);
+          if (!text) { U.showToast('请粘贴数据', 'error'); return; }
+          tryImport(text);
+        });
+      }
+
+      function tryImport(text) {
+        try {
+          S.importData(text);
+          U.showToast('导入成功', 'success');
+          JYS.App.navigateTo('/settings');
+        } catch (e) { U.showToast(e.message || '导入失败', 'error'); }
+      }
 
       document.getElementById('clearCache').addEventListener('click', function() {
         U.showConfirm('清理缓存', '将清理本地缓存数据，不影响核心数据。', '确认清理', '取消').then(function() {

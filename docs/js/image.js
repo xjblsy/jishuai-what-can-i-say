@@ -1,4 +1,4 @@
-const JYS = window.JYS = window.JYS || {};
+var JYS = window.JYS = window.JYS || {};
 
 JYS.Image = {
   MAX_SIZE: 2 * 1024 * 1024,
@@ -75,30 +75,18 @@ JYS.Image = {
       document.body.appendChild(input);
 
       input.onchange = function() {
+        clearTimeout(cancelTimer);
         var files = Array.from(input.files).slice(0, count);
         document.body.removeChild(input);
         resolve(files);
       };
 
-      input.oncancel = function() {
-        document.body.removeChild(input);
-        resolve([]);
-      };
-
-      setTimeout(function() {
-        var cancelled = false;
-        input.onblur = function() {
-          if (!input.files || input.files.length === 0) {
-            cancelled = true;
-          }
-        };
-        window.addEventListener('focus', function() {
-          if (cancelled) {
-            document.body.removeChild(input);
-            resolve([]);
-          }
-        }, { once: true });
-      }, 100);
+      var cancelTimer = setTimeout(function() {
+        if (!input.files || input.files.length === 0) {
+          document.body.removeChild(input);
+          resolve([]);
+        }
+      }, 60000);
 
       input.click();
     });

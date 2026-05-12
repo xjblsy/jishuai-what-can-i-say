@@ -1,4 +1,4 @@
-const JYS = window.JYS = window.JYS || {};
+var JYS = window.JYS = window.JYS || {};
 JYS.Pages = JYS.Pages || {};
 
 JYS.Pages.auth = function(params) {
@@ -8,11 +8,16 @@ JYS.Pages.auth = function(params) {
   var LOCK_DURATION = 30 * 60 * 1000;
 
   var remainingAttempts = MAX_ATTEMPTS;
-  var stored = localStorage.getItem('auth_attempts');
+  var stored;
+  try { stored = localStorage.getItem('auth_attempts'); } catch (e) {}
   if (stored) remainingAttempts = parseInt(stored);
 
-  var lockEnd = localStorage.getItem('auth_lock_end');
-  var locked = lockEnd && Date.now() < parseInt(lockEnd);
+  var lockEnd;
+  var locked = false;
+  try {
+    lockEnd = localStorage.getItem('auth_lock_end');
+    locked = lockEnd && Date.now() < parseInt(lockEnd);
+  } catch (e) {}
 
   if (JYS.App.checkAuth()) {
     setTimeout(function() { JYS.App.navigateTo('/home'); }, 50);
@@ -75,8 +80,8 @@ JYS.Pages.auth = function(params) {
         setTimeout(function() {
           var storedPassword = S.getPassword() || JYS.App.globalData.defaultPassword;
           if (password === storedPassword) {
-            localStorage.removeItem('auth_attempts');
-            localStorage.removeItem('auth_lock_end');
+            try { localStorage.removeItem('auth_attempts'); } catch (e) {}
+            try { localStorage.removeItem('auth_lock_end'); } catch (e) {}
             JYS.App.setAuth(60);
             U.showToast('验证成功', 'success');
             setTimeout(function() { JYS.App.navigateTo('/home'); }, 400);
@@ -89,14 +94,14 @@ JYS.Pages.auth = function(params) {
       function handleFailed() {
         remainingAttempts--;
         if (remainingAttempts < 0) remainingAttempts = 0;
-        localStorage.setItem('auth_attempts', remainingAttempts);
+        try { localStorage.setItem('auth_attempts', remainingAttempts); } catch (e) {}
         pwdInput.value = '';
         authBtn.classList.remove('disabled');
         authBtn.textContent = '进入小程序';
 
         if (remainingAttempts <= 0) {
           var lockEndTime = Date.now() + LOCK_DURATION;
-          localStorage.setItem('auth_lock_end', lockEndTime);
+          try { localStorage.setItem('auth_lock_end', lockEndTime); } catch (e) {}
           locked = true;
           authBtn.classList.add('disabled');
           authBtn.textContent = '账户已锁定';
@@ -108,8 +113,8 @@ JYS.Pages.auth = function(params) {
             if (Date.now() >= lockEndTime) {
               locked = false;
               remainingAttempts = MAX_ATTEMPTS;
-              localStorage.removeItem('auth_lock_end');
-              localStorage.removeItem('auth_attempts');
+              try { localStorage.removeItem('auth_lock_end'); } catch (e) {}
+              try { localStorage.removeItem('auth_attempts'); } catch (e) {}
               authBtn.classList.remove('disabled');
               authBtn.textContent = '进入小程序';
               authError.style.display = 'none';

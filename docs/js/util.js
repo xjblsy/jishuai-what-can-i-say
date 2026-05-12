@@ -1,4 +1,4 @@
-const JYS = window.JYS = window.JYS || {};
+var JYS = window.JYS = window.JYS || {};
 
 JYS.Util = {
   formatTime: function(timestamp) {
