@@ -1,0 +1,204 @@
+<view class="home-page">
+  <view class="home-header">
+    <view class="header-top">
+      <text class="header-greeting">{{greeting}}</text>
+      <view class="header-search-btn" bindtap="onSearch">
+        <text>🔍</text>
+      </view>
+    </view>
+    <text class="header-subtitle">记录每一个高光时刻</text>
+
+    <view class="stats-row">
+      <view class="stat-card">
+        <text class="stat-number">{{stats.characterCount}}</text>
+        <text class="stat-label">人物</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-number">{{stats.contentCount}}</text>
+        <text class="stat-label">语录</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-number">{{stats.favoriteCount}}</text>
+        <text class="stat-label">收藏</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="poster-section">
+    <view class="poster-section-header">
+      <text class="title">人物海报</text>
+      <text class="more" bindtap="onViewAllCharacters" wx:if="{{characters.length > 0}}">查看全部 ›</text>
+    </view>
+
+    <block wx:if="{{characters.length > 0}}">
+      <swiper
+        class="poster-swiper"
+        indicator-dots="{{false}}"
+        autoplay="{{true}}"
+        interval="{{4000}}"
+        duration="{{500}}"
+        circular="{{true}}"
+        previous-margin="30rpx"
+        next-margin="70rpx"
+        bindchange="onSwiperChange"
+        current="{{currentPoster}}"
+      >
+        <swiper-item wx:for="{{characters}}" wx:key="id">
+          <view
+            class="poster-card {{currentPoster === index ? 'active' : ''}}"
+            bindtap="onCharacterTap"
+            data-id="{{item.id}}"
+          >
+            <view class="poster-bg">
+              <image
+                wx:if="{{item.avatar}}"
+                class="poster-bg-img"
+                src="{{item.avatar}}"
+                mode="aspectFill"
+              />
+              <view wx:else style="width:100%;height:100%;background:linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)"></view>
+            </view>
+            <view class="poster-gradient"></view>
+            <view class="poster-gradient-top"></view>
+
+            <view class="poster-content">
+              <view class="poster-avatar-row">
+                <view class="poster-mini-avatar">
+                  <image
+                    wx:if="{{item.avatar}}"
+                    class="avatar-img"
+                    src="{{item.avatar}}"
+                    mode="aspectFill"
+                  />
+                  <view wx:else class="avatar-placeholder">
+                    <text>{{item.name[0]}}</text>
+                  </view>
+                </view>
+                <text class="poster-name">{{item.name}}</text>
+              </view>
+              <view class="poster-info-row">
+                <text class="poster-info-tag accent">{{item.contentCount || 0}}条语录</text>
+                <text class="poster-info-tag" wx:if="{{item.nickname}}">{{item.nickname}}</text>
+                <text class="poster-info-tag" wx:if="{{item.remark}}">{{item.remark}}</text>
+              </view>
+            </view>
+          </view>
+        </swiper-item>
+      </swiper>
+
+      <view class="poster-progress">
+        <view
+          class="progress-dot {{currentPoster === index ? 'active' : ''}} {{item.contentCount > 0 ? 'has-content' : ''}}"
+          wx:for="{{characters}}"
+          wx:key="id"
+          bindtap="onPosterDotTap"
+          data-index="{{index}}"
+        ></view>
+      </view>
+    </block>
+
+    <view class="poster-empty" wx:else>
+      <text class="empty-icon">🎬</text>
+      <text class="empty-text">还没有添加人物<br/>创建第一个角色海报吧</text>
+      <view class="empty-btn" bindtap="onAddCharacter">添加人物</view>
+    </view>
+  </view>
+
+  <view class="quick-section">
+    <view class="section-header">
+      <text class="title">快捷操作</text>
+    </view>
+    <view class="quick-actions">
+      <view class="quick-action-item" bindtap="onAddCharacter">
+        <view class="action-icon blue">👤</view>
+        <text class="action-name">添加人物</text>
+      </view>
+      <view class="quick-action-item" bindtap="onAddContent">
+        <view class="action-icon red">✍️</view>
+        <text class="action-name">记录语录</text>
+      </view>
+      <view class="quick-action-item" bindtap="onSearch">
+        <view class="action-icon green">🔍</view>
+        <text class="action-name">搜索</text>
+      </view>
+      <view class="quick-action-item" bindtap="onGoFavorites">
+        <view class="action-icon orange">⭐</view>
+        <text class="action-name">收藏</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="content-section">
+    <view class="section-header">
+      <text class="title">最新语录</text>
+      <text class="more" bindtap="onViewAllContents">查看全部 ›</text>
+    </view>
+
+    <view class="content-list" wx:if="{{recentContents.length > 0}}">
+      <view
+        class="content-item fade-in"
+        wx:for="{{recentContents}}"
+        wx:key="id"
+        bindtap="onContentTap"
+        data-id="{{item.id}}"
+        data-character-id="{{item.characterId}}"
+      >
+        <view class="content-item-header">
+          <view class="item-avatar">
+            <image
+              wx:if="{{item.characterAvatar}}"
+              class="avatar-img"
+              src="{{item.characterAvatar}}"
+              mode="aspectFill"
+            />
+            <text wx:else class="avatar-text">{{item.characterName[0]}}</text>
+          </view>
+          <text class="item-name">{{item.characterName}}</text>
+          <text class="item-time">{{item.formattedTime}}</text>
+        </view>
+
+        <view class="content-item-text">{{item.text}}</view>
+
+        <view class="content-item-images" wx:if="{{item.images && item.images.length > 0}}">
+          <view
+            class="content-item-image"
+            wx:for="{{item.images}}"
+            wx:for-item="img"
+            wx:key="*this"
+            catchtap="onPreviewImage"
+            data-urls="{{item.images}}"
+            data-current="{{index}}"
+          >
+            <image class="image" src="{{img}}" mode="aspectFill" />
+          </view>
+        </view>
+
+        <view class="content-item-tags" wx:if="{{item.tags && item.tags.length > 0}}">
+          <text class="tag tag-primary" wx:for="{{item.tags}}" wx:key="*this">{{item}}</text>
+        </view>
+
+        <view class="content-item-footer">
+          <view
+            class="footer-action {{item.isFavorite ? 'active' : ''}}"
+            catchtap="onToggleFavorite"
+            data-id="{{item.id}}"
+          >
+            {{item.isFavorite ? '⭐' : '☆'}} 收藏
+          </view>
+          <view class="footer-action" catchtap="onShareContent" data-id="{{item.id}}">
+            分享
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:else>
+      <text class="empty-icon">📝</text>
+      <text class="empty-text">还没有记录任何语录\n快去添加第一条吧</text>
+    </view>
+  </view>
+</view>
+
+<view class="add-fab" bindtap="onQuickAdd">
+  <text class="fab-icon">+</text>
+</view>

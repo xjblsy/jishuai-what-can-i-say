@@ -1,0 +1,140 @@
+<view class="settings-page">
+  <view class="storage-info" wx:if="{{stats}}">
+    <view class="info-item">
+      <text class="info-num">{{stats.characterCount}}</text>
+      <text class="info-label">人物</text>
+    </view>
+    <view class="info-item">
+      <text class="info-num">{{stats.contentCount}}</text>
+      <text class="info-label">语录</text>
+    </view>
+    <view class="info-item">
+      <text class="info-num">{{stats.favoriteCount}}</text>
+      <text class="info-label">收藏</text>
+    </view>
+    <view class="info-item">
+      <text class="info-num">{{stats.storageSize}}</text>
+      <text class="info-label">存储</text>
+    </view>
+  </view>
+
+  <view class="settings-section">
+    <text class="section-header">安全设置</text>
+    <view class="settings-item" bindtap="onChangePassword">
+      <view class="item-left">
+        <view class="item-icon red">🔑</view>
+        <view class="item-title">修改访问密码</view>
+      </view>
+      <text class="item-arrow">›</text>
+    </view>
+    <view class="settings-item" bindtap="onLockNow">
+      <view class="item-left">
+        <view class="item-icon red">🔒</view>
+        <view class="item-title">立即锁定</view>
+      </view>
+      <text class="item-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="settings-section">
+    <text class="section-header">数据管理</text>
+    <view class="settings-item" bindtap="onExportData">
+      <view class="item-left">
+        <view class="item-icon blue">📤</view>
+        <view>
+          <view class="item-title">导出数据</view>
+          <view class="item-desc">导出所有数据为文本格式</view>
+        </view>
+      </view>
+      <text class="item-arrow">›</text>
+    </view>
+    <view class="settings-item" bindtap="onImportData">
+      <view class="item-left">
+        <view class="item-icon green">📥</view>
+        <view>
+          <view class="item-title">导入数据</view>
+          <view class="item-desc">从剪贴板导入备份数据</view>
+        </view>
+      </view>
+      <text class="item-arrow">›</text>
+    </view>
+    <view class="settings-item" bindtap="onClearCache">
+      <view class="item-left">
+        <view class="item-icon orange">🗑️</view>
+        <view>
+          <view class="item-title">清理缓存</view>
+          <view class="item-desc">清理图片缓存文件</view>
+        </view>
+      </view>
+      <text class="item-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="settings-section">
+    <text class="section-header">其他</text>
+    <view class="settings-item" bindtap="onAbout">
+      <view class="item-left">
+        <view class="item-icon blue">ℹ️</view>
+        <view class="item-title">关于集英社</view>
+      </view>
+      <text class="item-value">v1.0.0</text>
+      <text class="item-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="logout-btn" bindtap="onLogout">
+    退出登录
+  </view>
+
+  <view class="version-info">
+    <text>集英社 v1.0.0 · 专注记录精彩瞬间</text>
+  </view>
+</view>
+
+<view class="password-modal-overlay" wx:if="{{showPasswordModal}}" catchtouchmove="noop">
+  <view class="password-modal">
+    <view class="modal-title">{{passwordModalTitle}}</view>
+
+    <view class="modal-input-group" wx:if="{{passwordModalType === 'change'}}">
+      <view class="modal-input-label">当前密码</view>
+      <input
+        class="modal-input"
+        type="password"
+        password="{{true}}"
+        placeholder="请输入当前密码"
+        value="{{oldPassword}}"
+        bindinput="onOldPasswordInput"
+      />
+    </view>
+
+    <view class="modal-input-group">
+      <view class="modal-input-label">新密码</view>
+      <input
+        class="modal-input"
+        type="password"
+        password="{{true}}"
+        placeholder="请输入新密码"
+        value="{{newPassword}}"
+        bindinput="onNewPasswordInput"
+      />
+    </view>
+
+    <view class="modal-input-group">
+      <view class="modal-input-label">确认新密码</view>
+      <input
+        class="modal-input"
+        type="password"
+        password="{{true}}"
+        placeholder="请再次输入新密码"
+        value="{{confirmPassword}}"
+        bindinput="onConfirmPasswordInput"
+        bindconfirm="onConfirmPasswordChange"
+      />
+    </view>
+
+    <view class="modal-buttons">
+      <view class="modal-btn cancel" bindtap="onClosePasswordModal">取消</view>
+      <view class="modal-btn confirm" bindtap="onConfirmPasswordChange">确认</view>
+    </view>
+  </view>
+</view>

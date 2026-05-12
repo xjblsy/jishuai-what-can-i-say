@@ -1,0 +1,117 @@
+<view class="search-page">
+  <view class="search-bar-area">
+    <view class="search-input-wrapper">
+      <text class="search-icon">🔍</text>
+      <input
+        placeholder="搜索人物或语录内容..."
+        value="{{keyword}}"
+        bindinput="onSearchInput"
+        bindconfirm="onSearchConfirm"
+        confirm-type="search"
+        focus="{{true}}"
+      />
+      <text class="clear-btn" wx:if="{{keyword}}" bindtap="onClear">✕</text>
+    </view>
+  </view>
+
+  <view class="search-tips" wx:if="{{!hasSearched}}">
+    <text class="tips-title">热门搜索</text>
+    <view class="hot-tags">
+      <text
+        class="hot-tag-item"
+        wx:for="{{hotTags}}"
+        wx:key="*this"
+        bindtap="onHotTagTap"
+        data-tag="{{item}}"
+      >{{item}}</text>
+    </view>
+  </view>
+
+  <view wx:if="{{hasSearched}}">
+    <view wx:if="{{characterResults.length > 0 || contentResults.length > 0}}">
+      <view class="result-info">
+        共找到 {{characterResults.length + contentResults.length}} 个结果
+      </view>
+
+      <view class="character-results" wx:if="{{characterResults.length > 0}}">
+        <view
+          class="char-result-item"
+          wx:for="{{characterResults}}"
+          wx:key="id"
+          bindtap="onCharacterTap"
+          data-id="{{item.id}}"
+        >
+          <view class="char-avatar">
+            <image
+              wx:if="{{item.avatar}}"
+              class="avatar-img"
+              src="{{item.avatar}}"
+              mode="aspectFill"
+            />
+            <text wx:else class="avatar-text">{{item.name[0]}}</text>
+          </view>
+          <view class="char-info">
+            <text class="char-name">
+            <text wx:for="{{item.nameSegments}}" wx:key="index" class="{{item.highlight ? 'highlight' : ''}}">{{item.text}}</text>
+          </text>
+            <text class="char-count">{{item.contentCount || 0}}条语录</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="section-divider" wx:if="{{characterResults.length > 0 && contentResults.length > 0}}" />
+
+      <view class="result-list" wx:if="{{contentResults.length > 0}}">
+        <view
+          class="result-item fade-in"
+          wx:for="{{contentResults}}"
+          wx:key="id"
+          bindtap="onContentTap"
+          data-id="{{item.id}}"
+          data-character-id="{{item.characterId}}"
+        >
+          <view class="item-header">
+            <view class="header-avatar">
+              <image
+                wx:if="{{item.characterAvatar}}"
+                class="avatar-img"
+                src="{{item.characterAvatar}}"
+                mode="aspectFill"
+              />
+              <text wx:else class="avatar-text">{{item.characterName[0]}}</text>
+            </view>
+            <text class="header-name">{{item.characterName}}</text>
+            <text class="header-time">{{item.formattedTime}}</text>
+          </view>
+
+          <view class="item-text" wx:if="{{item.text}}">
+            <text wx:for="{{item.textSegments}}" wx:key="index" class="{{item.highlight ? 'highlight' : ''}}">{{item.text}}</text>
+          </view>
+
+          <view class="item-images" wx:if="{{item.images && item.images.length > 0}}">
+            <view
+              class="item-image"
+              wx:for="{{item.images}}"
+              wx:for-item="img"
+              wx:key="*this"
+              catchtap="onPreviewImage"
+              data-urls="{{item.images}}"
+              data-current="{{index}}"
+            >
+              <image class="image" src="{{img}}" mode="aspectFill" />
+            </view>
+          </view>
+
+          <view class="item-tags" wx:if="{{item.tags && item.tags.length > 0}}">
+            <text class="tag tag-primary" wx:for="{{item.tags}}" wx:key="*this">{{item}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="no-result" wx:else>
+      <text class="no-result-icon">🔍</text>
+      <text class="no-result-text">未找到与"{{keyword}}"相关的结果</text>
+    </view>
+  </view>
+</view>

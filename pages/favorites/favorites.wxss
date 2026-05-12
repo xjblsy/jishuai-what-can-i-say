@@ -1,0 +1,135 @@
+.favorites-page {
+  padding: 24rpx;
+  padding-bottom: 40rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.header-count {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.header-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.header-actions text {
+  font-size: 24rpx;
+  color: #e94560;
+}
+
+.fav-item {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx 28rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.04);
+}
+
+.item-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.item-header .header-avatar {
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12rpx;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.item-header .header-avatar .avatar-img {
+  width: 100%;
+  height: 100%;
+}
+
+.item-header .header-avatar .avatar-text {
+  font-size: 24rpx;
+  color: #fff;
+}
+
+.item-header .header-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1a1a2e;
+  flex: 1;
+}
+
+.item-header .header-time {
+  font-size: 22rpx;
+  color: #bbb;
+}
+
+.item-text {
+  font-size: 28rpx;
+  color: #444;
+  line-height: 1.8;
+  margin-bottom: 16rpx;
+}
+
+.item-images {
+  display: flex;
+  gap: 10rpx;
+  margin-bottom: 12rpx;
+  flex-wrap: wrap;
+}
+
+.item-image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 10rpx;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.item-image .image {
+  width: 100%;
+  height: 100%;
+}
+
+.item-tags {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 8rpx;
+}
+
+.item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-footer .unfav-btn {
+  font-size: 24rpx;
+  color: #f2c94c;
+}
+
+.item-footer .action-btns {
+  display: flex;
+  gap: 20rpx;
+}
+
+.item-footer .action-btns text {
+  font-size: 24rpx;
+  color: #bbb;
+}
+
+.empty-state {
+  padding-top: 160rpx;
+}

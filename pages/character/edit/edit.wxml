@@ -1,0 +1,69 @@
+<view class="edit-page">
+  <view class="avatar-section">
+    <view class="avatar-picker" bindtap="onChooseAvatar">
+      <image
+        wx:if="{{avatar}}"
+        class="avatar-img"
+        src="{{avatar}}"
+        mode="aspectFill"
+      />
+      <text wx:else class="avatar-placeholder">📷</text>
+      <view class="avatar-overlay">
+        <text>{{avatar ? '更换' : '上传'}}</text>
+      </view>
+    </view>
+    <text class="avatar-tip">点击上传头像照片</text>
+  </view>
+
+  <view class="form-section">
+    <view class="form-group">
+      <view class="form-label">
+        <text>姓名</text>
+        <text class="required">*</text>
+      </view>
+      <input
+        class="form-input"
+        placeholder="请输入姓名"
+        value="{{name}}"
+        bindinput="onNameInput"
+        maxlength="20"
+      />
+    </view>
+
+    <view class="form-group">
+      <view class="form-label">
+        <text>昵称</text>
+      </view>
+      <input
+        class="form-input"
+        placeholder="请输入昵称（选填）"
+        value="{{nickname}}"
+        bindinput="onNicknameInput"
+        maxlength="20"
+      />
+    </view>
+
+    <view class="form-group">
+      <view class="form-label">
+        <text>备注说明</text>
+      </view>
+      <textarea
+        class="form-textarea"
+        placeholder="添加一些备注信息..."
+        value="{{remark}}"
+        bindinput="onRemarkInput"
+        maxlength="200"
+      />
+      <view class="char-counter">{{remark.length}}/200</view>
+    </view>
+  </view>
+
+  <view class="form-buttons">
+    <view class="form-btn primary" bindtap="onSave">保存</view>
+    <view class="form-btn secondary" bindtap="onCancel">取消</view>
+  </view>
+
+  <view class="delete-section" wx:if="{{isEdit}}">
+    <view class="delete-btn" bindtap="onDelete">删除此人物</view>
+  </view>
+</view>

@@ -1,0 +1,47 @@
+<view class="auth-page">
+  <view class="auth-header">
+    <view class="auth-logo">
+      <text class="logo-icon">英</text>
+    </view>
+    <text class="auth-title">集英社</text>
+    <text class="auth-subtitle">记录每一个精彩瞬间</text>
+  </view>
+
+  <view class="auth-form">
+    <view class="password-input-wrapper {{inputFocused ? 'focused' : ''}}">
+      <text class="input-icon">🔒</text>
+      <input
+        class="password-input"
+        type="password"
+        placeholder="请输入访问密码"
+        password="{{true}}"
+        value="{{password}}"
+        bindinput="onPasswordInput"
+        bindfocus="onInputFocus"
+        bindblur="onInputBlur"
+        bindconfirm="onLogin"
+        maxlength="20"
+      />
+    </view>
+
+    <view
+      class="auth-btn {{loading || locked ? 'disabled' : ''}}"
+      bindtap="onLogin"
+    >
+      {{loading ? '验证中...' : locked ? '账户已锁定' : '进入小程序'}}
+    </view>
+
+    <view class="auth-error" wx:if="{{errorMsg}}">
+      <text class="error-icon">⚠️</text>
+      <text>{{errorMsg}}</text>
+    </view>
+
+    <view class="attempt-hint" wx:if="{{remainingAttempts < 5 && !locked}}">
+      剩余尝试次数: {{remainingAttempts}} 次
+    </view>
+  </view>
+
+  <view class="auth-footer">
+    <text>集英社 v1.0.0 · 隐私保护</text>
+  </view>
+</view>

@@ -1,0 +1,208 @@
+.settings-page {
+  padding: 24rpx;
+  padding-bottom: 60rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.settings-section {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 0 28rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.section-header {
+  font-size: 24rpx;
+  color: #999;
+  padding: 24rpx 0 12rpx;
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 0;
+}
+
+.settings-item + .settings-item {
+  border-top: 1rpx solid #f5f5f5;
+}
+
+.item-left {
+  display: flex;
+  align-items: center;
+}
+
+.item-icon {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  margin-right: 16rpx;
+}
+
+.item-icon.red {
+  background: rgba(233, 69, 96, 0.1);
+  color: #e94560;
+}
+
+.item-icon.blue {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+}
+
+.item-icon.green {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.item-icon.orange {
+  background: rgba(255, 152, 0, 0.1);
+  color: #ff9800;
+}
+
+.item-title {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.item-desc {
+  font-size: 22rpx;
+  color: #aaa;
+  margin-top: 2rpx;
+}
+
+.item-value {
+  font-size: 26rpx;
+  color: #999;
+  margin-right: 10rpx;
+}
+
+.item-arrow {
+  font-size: 32rpx;
+  color: #ccc;
+}
+
+.logout-btn {
+  width: 100%;
+  height: 88rpx;
+  border-radius: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  color: #e94560;
+  background: #fff;
+  margin-top: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.version-info {
+  text-align: center;
+  padding: 40rpx 0;
+  font-size: 22rpx;
+  color: #ccc;
+}
+
+/* Password Modal */
+.password-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.password-modal {
+  background: #fff;
+  border-radius: 20rpx;
+  width: 580rpx;
+  padding: 40rpx;
+}
+
+.password-modal .modal-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #1a1a2e;
+  text-align: center;
+  margin-bottom: 32rpx;
+}
+
+.password-modal .modal-input-group {
+  margin-bottom: 20rpx;
+}
+
+.password-modal .modal-input-label {
+  font-size: 26rpx;
+  color: #555;
+  margin-bottom: 10rpx;
+}
+
+.password-modal .modal-input {
+  width: 100%;
+  height: 80rpx;
+  background: #f7f7f7;
+  border-radius: 12rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.password-modal .modal-buttons {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 32rpx;
+}
+
+.password-modal .modal-btn {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+}
+
+.password-modal .modal-btn.confirm {
+  background: linear-gradient(135deg, #e94560, #c23152);
+  color: #fff;
+}
+
+.password-modal .modal-btn.cancel {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.storage-info {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+}
+
+.storage-info .info-item .info-num {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #e94560;
+}
+
+.storage-info .info-item .info-label {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 4rpx;
+}
