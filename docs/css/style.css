@@ -35,6 +35,8 @@ textarea {
   font: inherit;
   outline: none;
   border: none;
+  -webkit-user-select: text;
+  user-select: text;
 }
 img {
   max-width: 100%;
@@ -176,22 +178,26 @@ body.auth-body #app {
   justify-content: center;
   padding: 40px 32px;
   position: relative;
-  overflow: hidden;
 }
 .auth-bg-decoration {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   overflow: hidden;
-  pointer-events: none;
+  pointer-events: none !important;
+  z-index: 0;
+}
+.auth-bg-decoration * {
+  pointer-events: none !important;
 }
 .auth-orb {
   position: absolute;
   border-radius: 50%;
   filter: blur(80px);
   opacity: 0.6;
+  pointer-events: none !important;
 }
 .auth-orb-1 {
   width: 400px;
@@ -234,7 +240,8 @@ body.auth-body #app {
   flex-direction: column;
   align-items: center;
   margin-bottom: 48px;
-  z-index: 1;
+  z-index: 10;
+  position: relative;
 }
 .auth-logo {
   width: 100px;
@@ -277,12 +284,10 @@ body.auth-body #app {
   max-width: 380px;
   z-index: 10;
   position: relative;
-  pointer-events: auto;
 }
 .input-group {
   margin-bottom: 20px;
   position: relative;
-  pointer-events: auto;
 }
 .input-label {
   display: block;
@@ -296,15 +301,14 @@ body.auth-body #app {
   width: 100%;
   height: 52px;
   background: rgba(255, 255, 255, 0.08);
-  border: 2px solid rgba(255, 255, 255, 0.12);
+  border: 2px solid rgba(255, 255, 255, 0.15) !important;
   border-radius: 14px;
   padding: 0 18px;
   font-size: 16px;
   color: #fff;
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  position: relative;
-  pointer-events: auto;
+  -webkit-appearance: none;
+  appearance: none;
 }
 .auth-input.single {
   margin-top: 0;
