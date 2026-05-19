@@ -8,7 +8,7 @@ JYS.Pages.characterDetail = function(params) {
 
   return Promise.all([
     S.getCharacterById(characterId),
-    S.getContents(characterId)
+    S.getContents({ characterId: characterId })
   ]).then(function(results) {
     var character = results[0];
     var contents = results[1];

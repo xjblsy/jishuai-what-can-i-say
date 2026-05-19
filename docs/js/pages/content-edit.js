@@ -134,7 +134,7 @@ JYS.Pages.contentEdit = function(params) {
           el.querySelector('.image-remove').addEventListener('click', function(e) {
             e.stopPropagation();
             var idx = parseInt(el.dataset.index);
-            if (idx >= 0 && idx < tempImages.length) tempImages.splice(idx, i);
+            if (idx >= 0 && idx < tempImages.length) tempImages.splice(idx, 1);
             imageList.removeChild(el);
             rebuildImages();
           });

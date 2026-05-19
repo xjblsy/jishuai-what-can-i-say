@@ -81,6 +81,25 @@ JYS.Util = {
     } catch (e) { return ''; }
   },
 
+  showLoading: function(msg) {
+    msg = msg || '加载中...';
+    var existing = document.querySelector('.loading-overlay');
+    if (existing) {
+      var t = existing.querySelector('.loading-text');
+      if (t) t.textContent = msg;
+      return;
+    }
+    var overlay = document.createElement('div');
+    overlay.className = 'loading-overlay';
+    overlay.innerHTML = '<div class="loading-spinner"></div><div class="loading-text">' + JYS.Util.escapeHtml(msg) + '</div>';
+    document.body.appendChild(overlay);
+  },
+
+  hideLoading: function() {
+    var overlay = document.querySelector('.loading-overlay');
+    if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+  },
+
   showToast: function(msg, type) {
     type = type || 'info';
     var container = document.getElementById('toast-container');
@@ -117,13 +136,16 @@ JYS.Util = {
       try {
         var overlay = document.createElement('div');
         overlay.className = 'modal-overlay active';
+        overlay.setAttribute('role', 'dialog');
+        overlay.setAttribute('aria-modal', 'true');
+        overlay.setAttribute('aria-label', title);
         overlay.innerHTML =
           '<div class="modal-content confirm-modal">' +
           '<div class="modal-title">' + JYS.Util.escapeHtml(title) + '</div>' +
           '<div class="modal-body">' + JYS.Util.escapeHtml(message) + '</div>' +
           '<div class="modal-buttons">' +
-          '<button class="modal-btn cancel">' + JYS.Util.escapeHtml(cancelText || '取消') + '</button>' +
-          '<button class="modal-btn confirm">' + JYS.Util.escapeHtml(confirmText || '确定') + '</button>' +
+          '<button class="modal-btn cancel" autocomplete="off">' + JYS.Util.escapeHtml(cancelText || '取消') + '</button>' +
+          '<button class="modal-btn confirm" autocomplete="off">' + JYS.Util.escapeHtml(confirmText || '确定') + '</button>' +
           '</div></div>';
 
         var container = document.getElementById('modal-container');
@@ -135,7 +157,13 @@ JYS.Util = {
 
         var dismiss = function() {
           if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+          document.removeEventListener('keydown', escHandler);
         };
+
+        var escHandler = function(e) {
+          if (e.key === 'Escape') { dismiss(); reject(new Error('cancelled')); }
+        };
+        document.addEventListener('keydown', escHandler);
 
         overlay.addEventListener('click', function(e) {
           if (e.target === overlay) {
@@ -155,6 +183,9 @@ JYS.Util = {
         });
 
         container.appendChild(overlay);
+
+        var focusEl = overlay.querySelector('.modal-btn.confirm');
+        if (focusEl) setTimeout(function() { focusEl.focus(); }, 100);
       } catch (e) { reject(e); }
     });
   },

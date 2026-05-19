@@ -172,10 +172,10 @@ function buildSettingsHTML(data, U, C, App) {
     '<span class="section-header">其他</span>' +
     '<div class="settings-item" id="aboutApp">' +
     '<div class="item-left"><div class="item-icon blue">ℹ️</div><div class="item-title">关于集英社</div></div>' +
-    '<span class="item-value">v2.0.0</span><span class="item-arrow">›</span></div>' +
+    '<span class="item-value">v2.1</span><span class="item-arrow">›</span></div>' +
     '</div>' +
     '<button class="logout-btn" id="logout">退出登录</button>' +
-    '<div class="version-info"><span>集英社 v2.0.0 · 专注记录精彩瞬间</span></div>' +
+    '<div class="version-info"><span>集英社 v2.1 · 专注记录精彩瞬间</span></div>' +
     '</div>';
 }
 
@@ -351,7 +351,7 @@ function initCommonHandlers(S, U, C, App) {
       overlay.innerHTML =
         '<div class="modal-content confirm-modal">' +
         '<div class="modal-title">关于集英社</div>' +
-        '<div class="modal-body">集英社 v2.0.0<br><br>一款专注于记录好友精彩言论的全栈应用。<br><br>功能介绍：<br>· 添加管理好友人物<br>· 记录文字和照片语录<br>· 标签分类管理<br>· 收藏和导出功能<br>· 密码保护隐私<br>· 云端数据存储（需配置Supabase）<br><br>安全特性：<br>· SHA-256加盐哈希密码存储<br>· 异常登录检测与锁定<br>· 90天密码过期提醒<br>· RLS行级数据隔离<br>· 活动审计日志</div>' +
+        '<div class="modal-body">集英社 v2.1<br><br>一款专注于记录好友精彩言论的全栈应用。<br><br>功能介绍：<br>· 添加管理好友人物<br>· 记录文字和照片语录<br>· 标签分类管理<br>· 收藏和导出功能<br>· 密码保护隐私<br>· 云端数据存储（需配置Supabase）<br><br>安全特性：<br>· SHA-256加盐哈希密码存储<br>· 异常登录检测与锁定<br>· 90天密码过期提醒<br>· RLS行级数据隔离<br>· 活动审计日志</div>' +
         '<div class="modal-buttons"><button class="modal-btn confirm">知道了</button></div></div>';
       var container = document.getElementById('modal-container');
       container.appendChild(overlay);

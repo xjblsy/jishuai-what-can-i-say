@@ -168,6 +168,17 @@ JYS.Pages.home = function(params) {
         var total = cards.length;
         var autoTimer = null;
         var isDragging = false, startX = 0, movedX = 0;
+        var listeners = [];
+
+        function on(name, el, fn) {
+          el.addEventListener(name, fn);
+          listeners.push({ name: name, el: el, fn: fn });
+        }
+
+        function cleanupAll() {
+          listeners.forEach(function(l) { l.el.removeEventListener(l.name, l.fn); });
+          listeners = [];
+        }
 
         function goTo(index) {
           if (index < 0) index = total - 1;
@@ -185,24 +196,24 @@ JYS.Pages.home = function(params) {
           stopAuto();
           autoTimer = setInterval(next, 4000);
         }
-        function stopAuto() { if (autoTimer) clearInterval(autoTimer); }
+        function stopAuto() { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } }
         function resetAuto() { stopAuto(); startAuto(); }
 
-        swiper.addEventListener('mousedown', function(e) {
+        on('mousedown', swiper, function(e) {
           isDragging = true; startX = e.clientX; stopAuto();
         });
-        swiper.addEventListener('touchstart', function(e) {
+        on('touchstart', swiper, function(e) {
           isDragging = true; startX = e.touches[0].clientX; stopAuto();
         });
 
-        window.addEventListener('mouseup', function(e) {
+        on('mouseup', window, function(e) {
           if (!isDragging) return;
           isDragging = false;
           var diff = e.clientX - startX;
           if (Math.abs(diff) > 40) { goTo(current + (diff > 0 ? -1 : 1)); }
           startAuto();
         });
-        swiper.addEventListener('touchend', function(e) {
+        on('touchend', swiper, function(e) {
           if (!isDragging) return;
           isDragging = false;
           var diff = (e.changedTouches[0].clientX || startX) - startX;
@@ -227,7 +238,7 @@ JYS.Pages.home = function(params) {
 
         startAuto();
           JYS.Pages._homeTimer = autoTimer;
-          JYS.Pages._homeCleanup = function() { stopAuto(); JYS.Pages._homeTimer = null; };
+          JYS.Pages._homeCleanup = function() { cleanupAll(); stopAuto(); JYS.Pages._homeTimer = null; };
         },
         onCleanup: function() {
           if (JYS.Pages._homeCleanup) { JYS.Pages._homeCleanup(); JYS.Pages._homeCleanup = null; }
@@ -249,8 +260,16 @@ JYS.Pages._toggleFavHome = function(id) {
 JYS.Pages._previewImg = function(url) {
   var overlay = document.createElement('div');
   overlay.className = 'img-preview-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-label', '图片预览');
   overlay.innerHTML = '<img src="' + url + '" alt="" />';
-  overlay.onclick = function() { document.body.removeChild(overlay); };
+  var escHandler = function(e) { if (e.key === 'Escape') closePreview(); };
+  var closePreview = function() {
+    document.body.removeChild(overlay);
+    document.removeEventListener('keydown', escHandler);
+  };
+  overlay.onclick = closePreview;
+  document.addEventListener('keydown', escHandler);
   document.body.appendChild(overlay);
 };
 

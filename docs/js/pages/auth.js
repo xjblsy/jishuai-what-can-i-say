@@ -80,7 +80,7 @@ function renderSupabaseAuth(App, S, C, U) {
         '</div>' +
         '<div class="auth-switch" id="authSwitch">' + U.escapeHtml(switchText) + '</div>' +
         '</div>' +
-        '<div class="auth-footer"><span>集英社 v3.0 · 安全加密传输</span></div>' +
+        '<div class="auth-footer"><span>集英社 v2.1 · 安全加密传输</span></div>' +
         '</div>',
 
       onRender: function() {
@@ -355,7 +355,7 @@ function renderLocalAuth(App, S, C, U) {
       '剩余尝试次数: ' + remainingAttempts + ' 次' +
       '</div>' +
       '</div>' +
-      '<div class="auth-footer"><span>集英社 v3.0 · 本地加密存储</span></div>',
+      '<div class="auth-footer"><span>集英社 v2.1 · 本地加密存储</span></div>',
 
     onRender: function() {
       if (locked) return;

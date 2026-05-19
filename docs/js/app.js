@@ -46,7 +46,8 @@ JYS.App = {
     }
 
     this.checkScreenSize();
-    window.addEventListener('resize', function() { self.checkScreenSize(); });
+    var debouncedResize = JYS.Util && JYS.Util.debounce && JYS.Util.debounce(function() { self.checkScreenSize(); }, 150);
+    window.addEventListener('resize', debouncedResize || function() { self.checkScreenSize(); });
 
     this._tryInitSupabase().then(function() {
       self._restoreSession().then(function() {
@@ -305,9 +306,21 @@ JYS.App = {
       if (result.error) throw new Error(result.error.message);
 
       var user = result.data.user;
+      var session = result.data.session;
+
       if (user) {
         JYS.Storage.setUserId(user.id);
+        self.globalData.isAuth = true;
         self.globalData.username = username;
+        self.globalData.userEmail = user.email;
+
+        if (session) {
+          self.globalData.sessionToken = session.access_token;
+          self.globalData.authExpireTime = session.expires_at
+            ? new Date(session.expires_at * 1000).getTime()
+            : Date.now() + self.SESSION_DURATION_MINUTES * 60 * 1000;
+        }
+
         JYS.Storage.logActivity('register', { email: user.email, username: username });
       }
 
@@ -395,17 +408,18 @@ JYS.App = {
 
     var renderer = JYS.Pages && JYS.Pages[pageName];
     if (!renderer) {
-      appEl.innerHTML = '<div class="empty-state"><div class="empty-icon">🔧</div><div class="empty-text">页面未找到</div></div>';
+      appEl.innerHTML = '<div class="empty-state"><div class="empty-icon">🔧</div><div class="empty-text">页面未找到</div><div class="empty-sub">' + this._safeHTML(pageName) + '</div></div>';
       return;
     }
 
     var self = this;
+    var result;
 
     try {
-      var result = renderer(params);
+      result = renderer(params);
     } catch (e) {
-      console.error('[集英社] 页面渲染异常:', e.message);
-      appEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">页面加载异常</div><div class="empty-sub">' + self._safeHTML(e.message) + '</div></div>';
+      console.error('[集英社] 页面渲染异常:', pageName, e.message);
+      appEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">页面加载异常</div><div class="empty-sub">请刷新页面后重试</div></div>';
       return;
     }
 
@@ -416,11 +430,13 @@ JYS.App = {
         self._renderHTML(appEl, resolved, pageName, params);
       }).catch(function(e) {
         if (self._currentPage !== pageName) return;
-        console.error('[集英社] 异步加载失败:', e.message);
-        appEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">加载失败</div><div class="empty-sub">请检查网络后刷新重试</div></div>';
+        console.error('[集英社] 异步加载失败:', pageName, e.message);
+        appEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">加载失败</div><div class="empty-sub">请检查网络后刷新重试</div><button class="empty-btn" onclick="location.reload()">刷新页面</button></div>';
       });
-    } else {
+    } else if (result) {
       this._renderHTML(appEl, result, pageName, params);
+    } else {
+      appEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">无内容</div></div>';
     }
   },
 
@@ -429,22 +445,17 @@ JYS.App = {
 
     appEl.innerHTML = this._sanitizeHTML(result.html);
 
+    if (result.onCleanup) {
+      this._currentCleanup = result.onCleanup;
+    }
+
     if (result.onRender) {
       var self = this;
       setTimeout(function() {
-        try {
-          if (typeof result.onCleanup === 'function') {
-            self._currentCleanup = result.onCleanup;
-          }
-          result.onRender(params);
-        } catch (e) {
-          console.error('[集英社] onRender 异常:', e.message);
+        try { result.onRender(params); } catch (e) {
+          console.error('[集英社] onRender 异常:', pageName, e.message);
         }
       }, 0);
-    }
-
-    if (result.onCleanup) {
-      this._currentCleanup = result.onCleanup;
     }
 
     if (pageName !== 'auth' && pageName !== 'home') {
