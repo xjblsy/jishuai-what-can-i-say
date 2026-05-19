@@ -9,17 +9,35 @@ JYS.App = {
     supabaseReady: false,
     sessionToken: null,
     userEmail: null,
+    username: null,
     passwordUpdatedAt: null
   },
+
+  _supabase: null,
+  _currentPage: null,
+  _currentCleanup: null,
+  _authListener: null,
+  _pageCache: {},
 
   SUPABASE_URL: 'https://wxiiojiahzvigkpwcnoz.supabase.co',
   SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4aWlvamlhaHp2aWdrcHdjbm96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNjE1MTgsImV4cCI6MjA5NDczNzUxOH0.slmxtNQBgCOeNOOMYzhGIZJPd90ZH3pXRx4Jn-7CVa4',
 
-  DEFAULT_PASSWORD: '',
   SESSION_DURATION_MINUTES: 1440,
+  MAX_RETRY_COUNT: 3,
+  RETRY_DELAY_MS: 1000,
 
   init: function() {
     var self = this;
+
+    window.addEventListener('error', function(e) {
+      if (e.target === window || e.target === document) {
+        console.error('[集英社] 未捕获错误:', e.message, e.filename, e.lineno);
+      }
+    });
+
+    window.addEventListener('unhandledrejection', function(e) {
+      console.error('[集英社] 未处理的Promise拒绝:', e.reason);
+    });
 
     if (window.location.protocol !== 'https:' &&
         window.location.hostname !== 'localhost' &&
@@ -102,12 +120,19 @@ JYS.App = {
           ? new Date(session.expires_at * 1000).getTime()
           : Date.now() + self.SESSION_DURATION_MINUTES * 60 * 1000;
         self.globalData.userEmail = session.user.email || '';
+        self.globalData.username = (session.user.user_metadata && session.user.user_metadata.username) || '';
         JYS.Storage.setUserId(session.user.id);
 
-        self._supabase.auth.onAuthStateChange(function(event, changedSession) {
+        if (self._authListener) {
+          self._authListener.subscription.unsubscribe();
+        }
+
+        self._authListener = self._supabase.auth.onAuthStateChange(function(event, changedSession) {
           if (event === 'SIGNED_OUT') {
+            self._cleanupCurrentPage();
             self.globalData.isAuth = false;
             self.globalData.sessionToken = null;
+            self.globalData.username = null;
             window.location.hash = '#/auth';
           } else if (event === 'TOKEN_REFRESHED' && changedSession) {
             self.globalData.sessionToken = changedSession.access_token;
@@ -137,15 +162,37 @@ JYS.App = {
   },
 
   _restoreLocalSessionFallback: function() {
+    this._restoreLocalSession();
+  },
+
+  _cleanupCurrentPage: function() {
     try {
-      var token = localStorage.getItem('jys_session');
-      var expire = localStorage.getItem('jys_session_expire');
-      if (token && expire && Date.now() < parseInt(expire)) {
-        this.globalData.isAuth = true;
-        this.globalData.sessionToken = token;
-        this.globalData.authExpireTime = parseInt(expire);
+      if (typeof this._currentCleanup === 'function') {
+        this._currentCleanup();
+      }
+      if (JYS.Pages._homeTimer) {
+        clearInterval(JYS.Pages._homeTimer);
+        JYS.Pages._homeTimer = null;
       }
     } catch (e) {}
+
+    this._currentCleanup = null;
+    this._currentPage = null;
+  },
+
+  _safeHTML: function(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  },
+
+  _sanitizeHTML: function(html) {
+    if (!html) return '';
+    return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+               .replace(/on\w+\s*=\s*"[^"]*"/gi, '')
+               .replace(/on\w+\s*=\s*'[^']*'/gi, '')
+               .replace(/javascript\s*:/gi, '')
+               .replace(/<embed\b[^>]*>/gi, '')
+               .replace(/<object\b[^>]*>/gi, '');
   },
 
   checkScreenSize: function() {
@@ -205,16 +252,23 @@ JYS.App = {
     var self = this;
     if (!this._supabase) return Promise.reject(new Error('数据库未连接'));
 
-    var email = username;
-    if (!username.includes('@')) {
-      email = username + '@jishuai.local';
+    var cleanUsername = String(username || '').trim();
+    var email = cleanUsername;
+    if (!cleanUsername.includes('@')) {
+      email = cleanUsername + '@jishuai.local';
     }
 
     return this._supabase.auth.signInWithPassword({
       email: email,
       password: password
     }).then(function(result) {
-      if (result.error) throw new Error(result.error.message);
+      if (result.error) {
+        var errMsg = result.error.message || '登录失败';
+        if (result.error.message && result.error.message.indexOf('Invalid login') >= 0) {
+          errMsg = '用户名或密码错误';
+        }
+        throw new Error(errMsg);
+      }
 
       var session = result.data.session;
       var user = result.data.user;
@@ -225,14 +279,14 @@ JYS.App = {
         ? new Date(session.expires_at * 1000).getTime()
         : Date.now() + self.SESSION_DURATION_MINUTES * 60 * 1000;
       self.globalData.userEmail = user.email;
-      self.globalData.username = user.user_metadata && user.user_metadata.username ? user.user_metadata.username : username;
+      self.globalData.username = (user.user_metadata && user.user_metadata.username) || cleanUsername;
       JYS.Storage.setUserId(user.id);
 
-      JYS.Storage.logActivity('login', { method: 'supabase_auth', email: user.email, username: username });
+      JYS.Storage.logActivity('login', { method: 'supabase_auth', username: cleanUsername });
 
       return { user: user, session: session };
     }).catch(function(e) {
-      JYS.Storage.logActivity('login_failed', { method: 'supabase_auth', username: username, error: e.message });
+      JYS.Storage.logActivity('login_failed', { method: 'supabase_auth', username: cleanUsername, error: (e.message || '') });
       throw e;
     });
   },
@@ -245,9 +299,7 @@ JYS.App = {
       email: email,
       password: password,
       options: {
-        data: {
-          username: username
-        }
+        data: { username: username }
       }
     }).then(function(result) {
       if (result.error) throw new Error(result.error.message);
@@ -264,8 +316,8 @@ JYS.App = {
   },
 
   signOutFromSupabase: function() {
-    if (!this._supabase) return Promise.resolve();
     var self = this;
+    if (!this._supabase) return Promise.resolve();
     return this._supabase.auth.signOut().then(function() {
       self.clearAuth();
     }).catch(function() {
@@ -278,6 +330,7 @@ JYS.App = {
     this.globalData.sessionToken = null;
     this.globalData.authExpireTime = 0;
     this.globalData.userEmail = null;
+    this.globalData.username = null;
     try {
       localStorage.removeItem('jys_session');
       localStorage.removeItem('jys_session_expire');
@@ -300,7 +353,10 @@ JYS.App = {
       return;
     }
 
+    this._cleanupCurrentPage();
+
     var page = this.parsePath(path);
+    this._currentPage = page.name;
     this.renderPage(page.name, page.params);
   },
 
@@ -311,7 +367,9 @@ JYS.App = {
     if (parts[1]) {
       parts[1].split('&').forEach(function(pair) {
         var kv = pair.split('=');
-        params[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || '');
+        if (kv[0]) {
+          params[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || '');
+        }
       });
     }
 
@@ -341,15 +399,25 @@ JYS.App = {
       return;
     }
 
-    var result = renderer(params);
+    var self = this;
+
+    try {
+      var result = renderer(params);
+    } catch (e) {
+      console.error('[集英社] 页面渲染异常:', e.message);
+      appEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">页面加载异常</div><div class="empty-sub">' + self._safeHTML(e.message) + '</div></div>';
+      return;
+    }
 
     if (result && typeof result.then === 'function') {
       appEl.innerHTML = '<div class="global-loading"><div class="loading-spinner"></div><div class="loading-text">加载中...</div></div>';
-      var self = this;
       result.then(function(resolved) {
+        if (self._currentPage !== pageName) return;
         self._renderHTML(appEl, resolved, pageName, params);
       }).catch(function(e) {
-        appEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">加载失败: ' + JYS.Util.escapeHtml(e.message || '') + '</div></div>';
+        if (self._currentPage !== pageName) return;
+        console.error('[集英社] 异步加载失败:', e.message);
+        appEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">加载失败</div><div class="empty-sub">请检查网络后刷新重试</div></div>';
       });
     } else {
       this._renderHTML(appEl, result, pageName, params);
@@ -357,13 +425,32 @@ JYS.App = {
   },
 
   _renderHTML: function(appEl, result, pageName, params) {
-    appEl.innerHTML = result.html || '';
+    if (!result || !result.html) return;
+
+    appEl.innerHTML = this._sanitizeHTML(result.html);
+
     if (result.onRender) {
-      setTimeout(function() { result.onRender(params); }, 0);
+      var self = this;
+      setTimeout(function() {
+        try {
+          if (typeof result.onCleanup === 'function') {
+            self._currentCleanup = result.onCleanup;
+          }
+          result.onRender(params);
+        } catch (e) {
+          console.error('[集英社] onRender 异常:', e.message);
+        }
+      }, 0);
     }
+
+    if (result.onCleanup) {
+      this._currentCleanup = result.onCleanup;
+    }
+
     if (pageName !== 'auth' && pageName !== 'home') {
       this.renderBackButton(appEl, pageName);
     }
+
     if (pageName === 'auth') {
       document.body.classList.add('auth-body');
     } else {
@@ -388,15 +475,15 @@ JYS.App = {
 
     var backBtn = document.createElement('div');
     backBtn.className = 'app-back-btn';
-    backBtn.innerHTML = '‹';
-    backBtn.title = '返回';
-    backBtn.onclick = function() {
+    backBtn.innerHTML = '&lsaquo;';
+    backBtn.setAttribute('title', '返回');
+    backBtn.addEventListener('click', function() {
       if (window.history.length > 1) {
         window.history.back();
       } else {
         window.location.hash = '#' + backTo;
       }
-    };
+    });
     appEl.insertBefore(backBtn, appEl.firstChild);
   },
 

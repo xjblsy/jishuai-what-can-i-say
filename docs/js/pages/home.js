@@ -226,10 +226,14 @@ JYS.Pages.home = function(params) {
         });
 
         startAuto();
-        JYS.Pages._homeTimer = autoTimer;
-      }
-    };
-  });
+          JYS.Pages._homeTimer = autoTimer;
+          JYS.Pages._homeCleanup = function() { stopAuto(); JYS.Pages._homeTimer = null; };
+        },
+        onCleanup: function() {
+          if (JYS.Pages._homeCleanup) { JYS.Pages._homeCleanup(); JYS.Pages._homeCleanup = null; }
+        }
+      };
+    });
 };
 
 JYS.Pages._goContentEdit = function(id, characterId) {

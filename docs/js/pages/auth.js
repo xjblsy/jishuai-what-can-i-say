@@ -55,15 +55,14 @@ function renderSupabaseAuth(App, S, C, U) {
         '<div class="auth-subtitle">' + U.escapeHtml(titleText) + '</div>' +
         '</div>' +
         '<div class="auth-form">' +
-        (isRegister ?
         '<div class="input-group" id="usernameGroup">' +
         '<label class="input-label">用户名</label>' +
-        '<input class="auth-input" id="authUsername" type="text" placeholder="设置您的用户名" autocomplete="username" />' +
-        '<div class="input-hint">用于登录，可包含字母、数字、下划线</div>' +
-        '</div>' : '') +
+        '<input class="auth-input" id="authUsername" type="text" placeholder="' + (isRegister ? '设置您的用户名' : '输入用户名') + '" autocomplete="username" />' +
+        (isRegister ? '<div class="input-hint">用于登录，可包含字母、数字、下划线</div>' : '') +
+        '</div>' +
         '<div class="input-group" id="pwdGroup">' +
         '<label class="input-label">密码</label>' +
-        '<input class="auth-input' + (isRegister ? '' : ' single') + '" id="authPassword" type="password" placeholder="' + (isRegister ? '设置登录密码' : '输入密码') + '" maxlength="128" autocomplete="current-password" />' +
+        '<input class="auth-input" id="authPassword" type="password" placeholder="' + (isRegister ? '设置登录密码' : '输入密码') + '" maxlength="128" autocomplete="current-password" />' +
         '</div>' +
         (isRegister ? '<div class="input-group" id="pwdStrengthGroup">' +
         '<div class="password-strength-info">' +
@@ -198,16 +197,10 @@ function renderSupabaseAuth(App, S, C, U) {
             });
 
           } else {
-            var username = (document.getElementById('authPassword').closest('.input-group').querySelector('.input-label')).textContent === '密码' ?
-              (document.querySelector('.auth-form input') || {value: ''}).value || '' : '';
-
+            var username = (document.getElementById('authUsername').value || '').trim();
             var password = (document.getElementById('authPassword').value || '');
 
             if (!username) {
-              var inputs = document.querySelectorAll('.auth-form .auth-input');
-              if (inputs.length > 0) {
-                inputs[0].focus();
-              }
               showError('请输入用户名');
               return;
             }
