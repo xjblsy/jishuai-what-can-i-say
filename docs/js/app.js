@@ -201,9 +201,14 @@ JYS.App = {
     } catch (e) {}
   },
 
-  loginWithSupabase: function(email, password) {
+  loginWithSupabase: function(username, password) {
     var self = this;
     if (!this._supabase) return Promise.reject(new Error('数据库未连接'));
+
+    var email = username;
+    if (!username.includes('@')) {
+      email = username + '@jishuai.local';
+    }
 
     return this._supabase.auth.signInWithPassword({
       email: email,
@@ -220,31 +225,38 @@ JYS.App = {
         ? new Date(session.expires_at * 1000).getTime()
         : Date.now() + self.SESSION_DURATION_MINUTES * 60 * 1000;
       self.globalData.userEmail = user.email;
+      self.globalData.username = user.user_metadata && user.user_metadata.username ? user.user_metadata.username : username;
       JYS.Storage.setUserId(user.id);
 
-      JYS.Storage.logActivity('login', { method: 'supabase_auth', email: user.email });
+      JYS.Storage.logActivity('login', { method: 'supabase_auth', email: user.email, username: username });
 
       return { user: user, session: session };
     }).catch(function(e) {
-      JYS.Storage.logActivity('login_failed', { method: 'supabase_auth', email: email, error: e.message });
+      JYS.Storage.logActivity('login_failed', { method: 'supabase_auth', username: username, error: e.message });
       throw e;
     });
   },
 
-  registerWithSupabase: function(email, password) {
+  registerWithSupabase: function(email, password, username) {
     var self = this;
     if (!this._supabase) return Promise.reject(new Error('数据库未连接'));
 
     return this._supabase.auth.signUp({
       email: email,
-      password: password
+      password: password,
+      options: {
+        data: {
+          username: username
+        }
+      }
     }).then(function(result) {
       if (result.error) throw new Error(result.error.message);
 
       var user = result.data.user;
       if (user) {
         JYS.Storage.setUserId(user.id);
-        JYS.Storage.logActivity('register', { email: user.email });
+        self.globalData.username = username;
+        JYS.Storage.logActivity('register', { email: user.email, username: username });
       }
 
       return result;
