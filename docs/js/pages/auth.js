@@ -39,6 +39,9 @@ function renderSupabaseAuth(App, S, C, U) {
     }
   } catch (e) {}
 
+  var INP_STYLE = 'width:100%;height:52px;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);border-radius:14px;padding:0 18px;font-size:16px;color:#fff;outline:none;box-sizing:border-box;caret-color:#fff;cursor:text;user-select:text;-webkit-user-select:text;position:relative;z-index:100';
+  var INP_FOCUS = INP_STYLE + ';border-color:rgba(233,69,96,0.6);background:rgba(255,255,255,0.15)';
+
   function buildForm() {
     var btnText = isRegister ? '注册账户' : '登录';
     var switchText = isRegister ? '已有账户？去登录' : '没有账户？去注册';
@@ -60,12 +63,12 @@ function renderSupabaseAuth(App, S, C, U) {
         '<div class="auth-form">' +
         '<div class="input-group" id="usernameGroup">' +
         '<label class="input-label">用户名</label>' +
-        '<input class="auth-input" id="authUsername" type="text" placeholder="' + (isRegister ? '设置您的用户名' : '输入用户名') + '" autocomplete="username" />' +
+        '<input id="authUsername" type="text" style="' + INP_STYLE + '" placeholder="' + (isRegister ? '设置您的用户名' : '输入用户名') + '" autocomplete="username" tabindex="1" />' +
         (isRegister ? '<div class="input-hint">用于登录，可包含字母、数字、下划线</div>' : '') +
         '</div>' +
         '<div class="input-group" id="pwdGroup">' +
         '<label class="input-label">密码</label>' +
-        '<input class="auth-input" id="authPassword" type="password" placeholder="' + (isRegister ? '设置登录密码' : '输入密码') + '" maxlength="128" autocomplete="current-password" />' +
+        '<input id="authPassword" type="password" style="' + INP_STYLE + '" placeholder="' + (isRegister ? '设置登录密码' : '输入密码') + '" maxlength="128" autocomplete="current-password" tabindex="2" />' +
         '</div>' +
         (isRegister ? '<div class="input-group" id="pwdStrengthGroup">' +
         '<div class="password-strength-info">' +
@@ -75,7 +78,7 @@ function renderSupabaseAuth(App, S, C, U) {
         '</div>' : '') +
         (isRegister ? '<div class="input-group" id="confirmGroup">' +
         '<label class="input-label">确认密码</label>' +
-        '<input class="auth-input" id="authConfirm" type="password" placeholder="再次输入密码" maxlength="128" autocomplete="new-password" />' +
+        '<input id="authConfirm" type="password" style="' + INP_STYLE + '" placeholder="再次输入密码" maxlength="128" autocomplete="new-password" tabindex="3" />' +
         '</div>' : '') +
         '<div class="auth-btn' + (isLocked ? ' disabled' : '') + '" id="authBtn">' + (isLocked ? '账户已锁定' : btnText) + '</div>' +
         '<div class="auth-error" id="authError"' + (errorMsg ? '' : ' style="display:none"') + '>' +
@@ -94,6 +97,20 @@ function renderSupabaseAuth(App, S, C, U) {
         var authBtn = document.getElementById('authBtn');
         var authError = document.getElementById('authError');
         var authSwitch = document.getElementById('authSwitch');
+
+        if (usernameInput) {
+          usernameInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(233,69,96,0.6)'; this.style.background = 'rgba(255,255,255,0.15)'; this.style.boxShadow = '0 0 0 4px rgba(233,69,96,0.1)'; });
+          usernameInput.addEventListener('blur', function() { this.style.borderColor = ''; this.style.background = ''; this.style.boxShadow = ''; });
+        }
+        if (pwdInput) {
+          pwdInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(233,69,96,0.6)'; this.style.background = 'rgba(255,255,255,0.15)'; this.style.boxShadow = '0 0 0 4px rgba(233,69,96,0.1)'; });
+          pwdInput.addEventListener('blur', function() { this.style.borderColor = ''; this.style.background = ''; this.style.boxShadow = ''; });
+        }
+        var confirmInput = document.getElementById('authConfirm');
+        if (confirmInput) {
+          confirmInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(233,69,96,0.6)'; this.style.background = 'rgba(255,255,255,0.15)'; this.style.boxShadow = '0 0 0 4px rgba(233,69,96,0.1)'; });
+          confirmInput.addEventListener('blur', function() { this.style.borderColor = ''; this.style.background = ''; this.style.boxShadow = ''; });
+        }
 
         if (isRegister && usernameInput) {
           usernameInput.addEventListener('input', function() {
@@ -318,6 +335,8 @@ function renderLocalAuth(App, S, C, U) {
   var titleText = hasAccount ? '欢迎回来' : '创建账户';
   var btnText = hasAccount ? '登录' : '创建账户';
 
+  var INP_STYLE = 'width:100%;height:52px;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);border-radius:14px;padding:0 18px;font-size:16px;color:#fff;outline:none;box-sizing:border-box;caret-color:#fff;cursor:text;user-select:text;-webkit-user-select:text;position:relative;z-index:100';
+
   return {
     html:
       '<div class="auth-page">' +
@@ -334,11 +353,11 @@ function renderLocalAuth(App, S, C, U) {
       '<div class="auth-form">' +
       '<div class="input-group">' +
       '<label class="input-label">用户名</label>' +
-      '<input class="auth-input' + (hasAccount ? ' single' : '') + '" id="authUsername" type="text" placeholder="' + (hasAccount ? '输入用户名' : '设置用户名') + '" autocomplete="username" />' +
+      '<input id="authUsername" type="text" style="' + INP_STYLE + '" placeholder="' + (hasAccount ? '输入用户名' : '设置用户名') + '" autocomplete="username" tabindex="1" />' +
       '</div>' +
       '<div class="input-group">' +
       '<label class="input-label">密码</label>' +
-      '<input class="auth-input' + (hasAccount ? ' single' : '') + '" id="authPassword" type="password" placeholder="' + (hasAccount ? '输入密码' : '设置密码（默认：jishuai@91）') + '" maxlength="128" autocomplete="current-password" />' +
+      '<input id="authPassword" type="password" style="' + INP_STYLE + '" placeholder="' + (hasAccount ? '输入密码' : '设置密码（默认：jishuai@91）') + '" maxlength="128" autocomplete="current-password" tabindex="2" />' +
       '</div>' +
       (!hasAccount ? '<div class="input-group" id="pwdStrengthGroup">' +
       '<div class="password-strength-info">' +
@@ -348,7 +367,7 @@ function renderLocalAuth(App, S, C, U) {
       '</div>' +
       '<div class="input-group">' +
       '<label class="input-label">确认密码</label>' +
-      '<input class="auth-input" id="authConfirm" type="password" placeholder="再次输入密码" maxlength="128" autocomplete="new-password" />' +
+      '<input id="authConfirm" type="password" style="' + INP_STYLE + '" placeholder="再次输入密码" maxlength="128" autocomplete="new-password" tabindex="3" />' +
       '</div>' : '') +
       '<div class="auth-btn' + (locked ? ' disabled' : '') + '" id="authBtn">' + (locked ? '账户已锁定' : btnText) + '</div>' +
       '<div class="auth-error" id="authError"' + (errorMsg ? '' : ' style="display:none"') + '>' +
@@ -368,6 +387,20 @@ function renderLocalAuth(App, S, C, U) {
       var authBtn = document.getElementById('authBtn');
       var authError = document.getElementById('authError');
       var attemptHint = document.getElementById('attemptHint');
+
+      if (usernameInput) {
+        usernameInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(233,69,96,0.6)'; this.style.background = 'rgba(255,255,255,0.15)'; this.style.boxShadow = '0 0 0 4px rgba(233,69,96,0.1)'; });
+        usernameInput.addEventListener('blur', function() { this.style.borderColor = ''; this.style.background = ''; this.style.boxShadow = ''; });
+      }
+      if (pwdInput) {
+        pwdInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(233,69,96,0.6)'; this.style.background = 'rgba(255,255,255,0.15)'; this.style.boxShadow = '0 0 0 4px rgba(233,69,96,0.1)'; });
+        pwdInput.addEventListener('blur', function() { this.style.borderColor = ''; this.style.background = ''; this.style.boxShadow = ''; });
+      }
+      var confirmInput = document.getElementById('authConfirm');
+      if (confirmInput) {
+        confirmInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(233,69,96,0.6)'; this.style.background = 'rgba(255,255,255,0.15)'; this.style.boxShadow = '0 0 0 4px rgba(233,69,96,0.1)'; });
+        confirmInput.addEventListener('blur', function() { this.style.borderColor = ''; this.style.background = ''; this.style.boxShadow = ''; });
+      }
 
       if (hasAccount) {
         usernameInput.value = storedUsername || '';
