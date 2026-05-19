@@ -102,3 +102,17 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON app_settings TO authenticated;
 GRANT SELECT, INSERT ON activity_log TO authenticated;
 
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO authenticated;
+
+-- ============================================================
+-- 授予 anon 角色（客户端 SDK 使用的匿名角色）基础权限
+-- 使 RLS 策略能够正常执行
+-- ============================================================
+GRANT USAGE ON SCHEMA public TO anon;
+GRANT SELECT ON characters TO anon;
+GRANT SELECT ON contents TO anon;
+GRANT SELECT ON app_settings TO anon;
+GRANT SELECT ON activity_log TO anon;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO anon;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE ON SEQUENCES TO anon;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO anon;
