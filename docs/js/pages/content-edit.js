@@ -1,302 +1,249 @@
+var JYS = window.JYS = window.JYS || {};
+JYS.Pages = JYS.Pages || {};
+
 JYS.Pages.contentEdit = function(params) {
   var S = JYS.Storage;
   var U = JYS.Util;
-  var MAX_TEXT_LENGTH = 20000;
-  var MAX_IMAGES = 18;
-  var MAX_TAG_LENGTH = 15;
-
   var isEdit = !!params.id;
   var contentId = params.id || '';
-  var characters = S.getCharacters();
+  var charId = params.characterId || '';
+  var text = '', images = [], tags = [];
+  var tempImages = [];
+  var allTagsData = [];
 
-  var selectedCharacter = {};
-  var text = '';
-  var images = [];
-  var selectedTags = [];
-  var customTags = S.getTags();
-  var defaultTags = U.getDefaultTags();
+  var dataPromise;
 
   if (isEdit) {
-    var content = S.getContentById(contentId);
-    if (content) {
-      var character = S.getCharacterById(content.characterId);
-      selectedCharacter = character || {};
-      text = content.text || '';
-      images = content.images || [];
-      selectedTags = content.tags || [];
-    }
-  } else if (params.characterId) {
-    selectedCharacter = S.getCharacterById(params.characterId) || {};
+    dataPromise = Promise.all([
+      S.getContentById(contentId),
+      S.getCharacters(),
+      S.getTags()
+    ]).then(function(results) {
+      var content = results[0];
+      var characters = results[1];
+      allTagsData = results[2];
+
+      if (content) {
+        text = content.text || '';
+        images = content.images || [];
+        tags = content.tags || [];
+        if (content.characterId) charId = content.characterId;
+      }
+
+      return { characters: characters };
+    });
+  } else {
+    dataPromise = Promise.all([
+      S.getCharacters(),
+      S.getTags()
+    ]).then(function(results) {
+      var characters = results[0];
+      allTagsData = results[1];
+
+      if (!charId && characters.length > 0) charId = characters[0].id;
+
+      return { characters: characters };
+    });
   }
 
-  if (characters.length === 0 && !isEdit) {
+  return dataPromise.then(function(extra) {
+    var characters = extra.characters;
+
+    var charOptions = '';
+    characters.forEach(function(c) {
+      charOptions += '<option value="' + c.id + '"' + (c.id === charId ? ' selected' : '') + '>' + U.escapeHtml(c.name) + '</option>';
+    });
+
+    var imageHTML = '';
+    images.forEach(function(img, i) {
+      imageHTML += '<div class="image-item" data-index="' + i + '"><img class="image" src="' + U.escapeHtml(img) + '" alt="" /><div class="image-remove">✕</div></div>';
+    });
+
+    var tagHTML = '';
+    tags.forEach(function(t) {
+      tagHTML += '<span class="tag tag-editable" data-tag="' + U.escapeHtml(t) + '">' + U.escapeHtml(t) + '<span class="tag-remove">✕</span></span>';
+    });
+
     return {
       html:
-        '<div class="edit-page">' +
-        '<div class="empty-character-hint">' +
-        '<div class="hint-icon">👤</div>' +
-        '<div class="hint-text">请先添加人物，才能记录语录哦</div>' +
-        '<a class="hint-btn" href="#/character/edit">去添加人物</a>' +
-        '</div></div>'
-    };
-  }
-
-  var charSelectorHTML = '';
-  if (!isEdit) {
-    charSelectorHTML =
-      '<div class="character-selector-area">' +
-      '<span class="selector-label">选择人物</span>' +
-      '<div class="character-picker" id="charPicker">' +
-      '<div class="picker-avatar">' +
-      (selectedCharacter.avatar ? '<img class="avatar-img" src="' + U.escapeHtml(selectedCharacter.avatar) + '" alt="" />' :
-      '<span class="avatar-text">' + (selectedCharacter.name ? selectedCharacter.name[0] : '?') + '</span>') +
-      '</div>' +
-      (selectedCharacter.name ? '<span class="picker-name">' + U.escapeHtml(selectedCharacter.name) + '</span>' :
-      '<span class="picker-placeholder">请选择人物</span>') +
-      '<span class="picker-arrow">›</span>' +
-      '</div></div>';
-  }
-
-  var imagesHTML = '<div class="image-grid" id="imageGrid">';
-  images.forEach(function(img, i) {
-    imagesHTML +=
-      '<div class="image-item" data-index="' + i + '">' +
-      '<img class="image" src="' + U.escapeHtml(img) + '" alt="" />' +
-      '<div class="delete-btn"><span>✕</span></div>' +
-      '</div>';
-  });
-  if (images.length < MAX_IMAGES) {
-    imagesHTML +=
-      '<div class="add-image-btn" id="addImageBtn">' +
-      '<span class="add-icon">+</span>' +
-      '<span class="add-text">' + images.length + '/' + MAX_IMAGES + '</span>' +
-      '</div>';
-  }
-  imagesHTML += '</div>';
-
-  var tagsHTML = '<div class="tags-wrapper" id="tagsWrapper">';
-  defaultTags.forEach(function(t) {
-    tagsHTML += '<span class="tag-item' + (selectedTags.indexOf(t) !== -1 ? ' selected' : '') + '" data-tag="' + U.escapeHtml(t) + '">' + U.escapeHtml(t) + '</span>';
-  });
-  if (customTags.length > 0) {
-    customTags.forEach(function(t) {
-      if (defaultTags.indexOf(t) === -1) {
-        tagsHTML += '<span class="tag-item' + (selectedTags.indexOf(t) !== -1 ? ' selected' : '') + '" data-tag="' + U.escapeHtml(t) + '">' + U.escapeHtml(t) + '</span>';
-      }
-    });
-  }
-  tagsHTML += '<input class="custom-tag-input" id="customTagInput" placeholder="自定义标签" maxlength="15" />';
-  tagsHTML += '</div>';
-
-  var charPickerModalHTML = '';
-  if (!isEdit) {
-    charPickerModalHTML =
-      '<div class="modal-overlay' + (characters.length > 0 ? '' : ' hidden') + '" id="charPickerModal" style="display:none">' +
-      '<div class="modal-content">' +
-      '<div class="modal-title">选择人物</div>';
-    characters.forEach(function(c) {
-      charPickerModalHTML +=
-        '<div class="picker-character-item' + (selectedCharacter.id === c.id ? ' selected' : '') + '" data-id="' + c.id + '">' +
-        '<div class="picker-char-avatar">' +
-        (c.avatar ? '<img class="avatar-img" src="' + U.escapeHtml(c.avatar) + '" alt="" />' : '<span class="avatar-text">' + U.escapeHtml(c.name[0]) + '</span>') +
+        '<div class="edit-page content-edit-page">' +
+        '<div class="form-section">' +
+        '<div class="form-group">' +
+        '<div class="form-label"><span>所属人物</span><span class="required">*</span></div>' +
+        '<select class="form-select" id="contentChar">' + charOptions + '</select>' +
         '</div>' +
-        '<div class="picker-char-info">' +
-        '<span class="picker-char-name">' + U.escapeHtml(c.name) + '</span>' +
-        (c.nickname ? '<span class="picker-char-nickname">@' + U.escapeHtml(c.nickname) + '</span>' : '') +
+        '<div class="form-group">' +
+        '<div class="form-label"><span>语录内容</span></div>' +
+        '<textarea class="form-textarea content-textarea" id="contentText" placeholder="在这里记录精彩的语录..." maxlength="20000">' + U.escapeHtml(text) + '</textarea>' +
+        '<div class="text-counter"><span id="textCount">' + text.length + '</span>/20000</div>' +
         '</div>' +
-        (selectedCharacter.id === c.id ? '<span class="picker-char-check">✓</span>' : '') +
-        '</div>';
-    });
-    charPickerModalHTML +=
-      '<div class="picker-cancel-wrapper"><span class="picker-cancel-btn" id="closeCharPicker">取消</span></div>' +
-      '</div></div>';
-  }
+        '<div class="form-group">' +
+        '<div class="form-label"><span>图片</span><span class="counter-tip">最多18张</span></div>' +
+        '<div class="image-list" id="imageList">' + imageHTML + '</div>' +
+        '<div class="add-image-btn" id="addImages">📷 添加图片</div>' +
+        '<input type="file" id="imageFileInput" accept="image/*" multiple style="display:none" />' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<div class="form-label"><span>标签</span></div>' +
+        '<div class="tag-input-wrapper">' +
+        '<div class="tags-display" id="tagsDisplay">' + tagHTML + '</div>' +
+        '<div class="tag-input-row"><input class="tag-input" id="tagInput" placeholder="输入标签后回车添加" maxlength="15" /><div class="tag-add-btn" id="addTag">+</div></div>' +
+        (allTagsData.length > 0 ? '<div class="tag-suggestions"><span class="suggest-label">已有标签：</span>' + allTagsData.map(function(t) { return '<span class="suggest-tag" data-tag="' + U.escapeHtml(t) + '">' + U.escapeHtml(t) + '</span>'; }).join('') + '</div>' : '') +
+        '</div>' +
+        '</div></div>' +
+        '<div class="form-buttons">' +
+        '<button class="form-btn primary" id="saveContent">保存</button>' +
+        '<button class="form-btn secondary" id="cancelContent">取消</button>' +
+        '</div>' +
+        (isEdit ? '<div class="delete-section"><button class="delete-btn" id="deleteContent">删除此内容</button></div>' : ''),
 
-  return {
-    html:
-      '<div class="edit-page">' +
-      charSelectorHTML +
-      '<div class="content-section">' +
-      '<textarea class="content-textarea" id="contentText" placeholder="请输入精彩言论..." maxlength="' + MAX_TEXT_LENGTH + '">' + U.escapeHtml(text) + '</textarea>' +
-      '<div class="text-char-count" id="charCount">' + text.length + '/' + MAX_TEXT_LENGTH + '</div>' +
-      '</div>' +
-      '<div class="images-section">' +
-      '<span class="section-label">照片（选填）</span>' +
-      imagesHTML +
-      '</div>' +
-      '<div class="tags-section">' +
-      '<span class="section-label">分类标签（选填）</span>' +
-      tagsHTML +
-      '</div>' +
-      '</div>' +
-      '<div class="action-bar">' +
-      '<button class="action-btn preview" id="previewBtn">预览</button>' +
-      '<button class="action-btn primary" id="submitBtn">提交</button>' +
-      '</div>' +
-      charPickerModalHTML +
-      '<input type="file" id="contentImageInput" accept="image/*" multiple style="display:none" />',
+      onRender: function() {
+        tempImages = images.slice();
 
-    onRender: function() {
-      var saving = false;
-
-      var charPicker = document.getElementById('charPicker');
-      var charPickerModal = document.getElementById('charPickerModal');
-      if (charPicker && charPickerModal) {
-        charPicker.addEventListener('click', function() {
-          charPickerModal.style.display = '';
+        var textEl = document.getElementById('contentText');
+        textEl.addEventListener('input', function() {
+          document.getElementById('textCount').textContent = this.value.length;
         });
-        document.getElementById('closeCharPicker').addEventListener('click', function() {
-          charPickerModal.style.display = 'none';
+
+        var imageFileInput = document.getElementById('imageFileInput');
+        var imageList = document.getElementById('imageList');
+        var addImagesBtn = document.getElementById('addImages');
+
+        addImagesBtn.addEventListener('click', function() { imageFileInput.click(); });
+        imageFileInput.addEventListener('change', function() {
+          var files = Array.from(imageFileInput.files);
+          if (!files.length) return;
+          U.showLoading('处理中...');
+          var promises = files.map(function(f) { return JYS.Image.uploadImage(f); });
+          Promise.all(promises).then(function(dataUrls) {
+            dataUrls.forEach(function(url) {
+              if (tempImages.length < 18) {
+                tempImages.push(url);
+                addImagePreview(url, tempImages.length - 1);
+              }
+            });
+            U.hideLoading();
+          }).catch(function() { U.hideLoading(); U.showToast('图片处理失败', 'error'); });
         });
-        charPickerModal.querySelectorAll('.picker-character-item').forEach(function(item) {
-          item.addEventListener('click', function() {
-            var c = S.getCharacterById(item.dataset.id);
-            if (c) {
-              selectedCharacter = c;
-              JYS.App.navigateTo('/content/edit?characterId=' + c.id);
-            }
+
+        function addImagePreview(url, index) {
+          var el = document.createElement('div');
+          el.className = 'image-item';
+          el.dataset.index = index;
+          el.innerHTML = '<img class="image" src="' + U.escapeHtml(url) + '" alt="" /><div class="image-remove">✕</div>';
+          el.querySelector('.image-remove').addEventListener('click', function(e) {
+            e.stopPropagation();
+            var idx = parseInt(el.dataset.index);
+            if (idx >= 0 && idx < tempImages.length) tempImages.splice(idx, i);
+            imageList.removeChild(el);
+            rebuildImages();
+          });
+          imageList.appendChild(el);
+        }
+
+        function rebuildImages() {
+          imageList.innerHTML = '';
+          tempImages.forEach(function(img, i) { addImagePreview(img, i); });
+        }
+
+        var tagsDisplay = document.getElementById('tagsDisplay');
+        var tagInput = document.getElementById('tagInput');
+        var addTagBtn = document.getElementById('addTag');
+
+        function addTag(name) {
+          if (tags.length >= 20) { U.showToast('最多添加20个标签', 'error'); return; }
+          if (tags.indexOf(name) !== -1) { U.showToast('标签已存在', 'error'); return; }
+          tags.push(name);
+          var tagEl = document.createElement('span');
+          tagEl.className = 'tag tag-editable';
+          tagEl.dataset.name = name;
+          tagEl.innerHTML = U.escapeHtml(name) + '<span class="tag-remove">✕</span>';
+          tagEl.querySelector('.tag-remove').addEventListener('click', function() {
+            var idx = tags.indexOf(name);
+            if (idx !== -1) tags.splice(idx, 1);
+            tagsDisplay.removeChild(tagEl);
+          });
+          tagsDisplay.appendChild(tagEl);
+        }
+
+        addTagBtn.addEventListener('click', function() {
+          var name = tagInput.value.trim();
+          if (!name) return;
+          addTag(name);
+          tagInput.value = '';
+        });
+        tagInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            var name = tagInput.value.trim();
+            if (!name) return;
+            addTag(name);
+            tagInput.value = '';
+          }
+        });
+
+        document.querySelectorAll('.suggest-tag').forEach(function(st) {
+          st.addEventListener('click', function() { addTag(st.dataset.tag); });
+        });
+
+        document.querySelectorAll('.tag-editable .tag-remove').forEach(function(rm) {
+          rm.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var parent = rm.parentNode;
+            var name = parent.dataset.tag;
+            var idx = tags.indexOf(name);
+            if (idx !== -1) tags.splice(idx, 1);
+            tagsDisplay.removeChild(parent);
           });
         });
-      }
 
-      var textarea = document.getElementById('contentText');
-      var charCount = document.getElementById('charCount');
-      textarea.addEventListener('input', function() {
-        text = textarea.value;
-        charCount.textContent = text.length + '/' + MAX_TEXT_LENGTH;
-      });
-
-      var imageGrid = document.getElementById('imageGrid');
-      var imageInput = document.getElementById('contentImageInput');
-      var addImageBtn = document.getElementById('addImageBtn');
-      if (addImageBtn) {
-        addImageBtn.addEventListener('click', function() { imageInput.click(); });
-      }
-
-      imageInput.addEventListener('change', function() {
-        var files = Array.from(imageInput.files).slice(0, MAX_IMAGES - images.length);
-        if (files.length === 0) { imageInput.value = ''; return; }
-        U.showLoading('处理图片中...');
-
-        var processed = [];
-        function processNext(index) {
-          if (index >= files.length) {
-            images = images.concat(processed);
-            U.hideLoading();
-            JYS.App.navigateTo('/content/edit' + (isEdit ? '?id=' + contentId : '?characterId=' + (selectedCharacter.id || '')));
-            return;
-          }
-          JYS.Image.uploadImage(files[index]).then(function(dataUrl) {
-            processed.push(dataUrl);
-            processNext(index + 1);
-          }).catch(function() { processNext(index + 1); });
-        }
-        processNext(0);
-      });
-
-      imageGrid.addEventListener('click', function(e) {
-        var deleteBtn = e.target.closest('.delete-btn');
-        if (deleteBtn) {
-          var item = deleteBtn.closest('.image-item');
-          var index = parseInt(item.dataset.index);
-          images.splice(index, 1);
-          JYS.App.navigateTo('/content/edit' + (isEdit ? '?id=' + contentId : '?characterId=' + (selectedCharacter.id || '')));
-          return;
-        }
-        var img = e.target.closest('.image-item img');
-        if (img) {
-          JYS.Pages._previewImg(img.src);
-        }
-      });
-
-      var tagsWrapper = document.getElementById('tagsWrapper');
-      tagsWrapper.addEventListener('click', function(e) {
-        var tagItem = e.target.closest('.tag-item');
-        if (!tagItem) return;
-        var tag = tagItem.dataset.tag;
-        var idx = selectedTags.indexOf(tag);
-        if (idx !== -1) { selectedTags.splice(idx, 1); tagItem.classList.remove('selected'); }
-        else { selectedTags.push(tag); tagItem.classList.add('selected'); }
-      });
-
-      var customTagInput = document.getElementById('customTagInput');
-      customTagInput.addEventListener('keydown', function(e) {
-        if (e.key !== 'Enter') return;
-        var tag = customTagInput.value.trim();
-        if (!tag) return;
-        if (tag.length > MAX_TAG_LENGTH) { U.showToast('标签最多' + MAX_TAG_LENGTH + '个字', 'warning'); return; }
-        if (selectedTags.indexOf(tag) !== -1) { U.showToast('标签已存在', 'warning'); customTagInput.value = ''; return; }
-        selectedTags.push(tag);
-        if (customTags.indexOf(tag) === -1) { customTags.push(tag); S.saveTags(customTags); }
-        customTagInput.value = '';
-        JYS.App.navigateTo('/content/edit' + (isEdit ? '?id=' + contentId : '?characterId=' + (selectedCharacter.id || '')));
-      });
-
-      document.getElementById('previewBtn').addEventListener('click', function() {
-        if (!validate()) return;
-        showPreview();
-      });
-
-      document.getElementById('submitBtn').addEventListener('click', function() {
-        if (!validate()) return;
-        doSubmit();
-      });
-
-      function validate() {
-        if (!isEdit && !selectedCharacter.id) { U.showToast('请选择人物', 'error'); return false; }
-        return true;
-      }
-
-      function showPreview() {
-        var overlay = document.createElement('div');
-        overlay.className = 'preview-overlay';
-        overlay.innerHTML =
-          '<div class="preview-header">' +
-          '<div class="close-btn" id="closePreview">✕</div>' +
-          '<div class="confirm-btn" id="confirmPreview">确认提交</div>' +
-          '</div>' +
-          '<div class="preview-body"><div class="preview-card">' +
-          '<div class="preview-character">' +
-          '<div class="pc-avatar">' +
-          (selectedCharacter.avatar ? '<img class="avatar-img" src="' + U.escapeHtml(selectedCharacter.avatar) + '" alt="" />' :
-          '<span class="avatar-text">' + (selectedCharacter.name ? selectedCharacter.name[0] : '?') + '</span>') +
-          '</div>' +
-          '<span class="pc-name">' + (selectedCharacter.name || '未选择') + '</span>' +
-          '</div>' +
-          '<div class="preview-text">' + (textarea.value || '（无文字内容）') + '</div>' +
-          (images.length > 0 ? '<div class="preview-images">' + images.map(function(img) { return '<div class="preview-image"><img class="image" src="' + U.escapeHtml(img) + '" alt="" /></div>'; }).join('') + '</div>' : '') +
-          (selectedTags.length > 0 ? '<div class="preview-tags">' + selectedTags.map(function(t) { return '<span class="tag tag-primary">' + U.escapeHtml(t) + '</span>'; }).join('') + '</div>' : '') +
-          '</div></div>';
-        document.body.appendChild(overlay);
-
-        overlay.querySelector('#closePreview').addEventListener('click', function() { document.body.removeChild(overlay); });
-        overlay.querySelector('#confirmPreview').addEventListener('click', function() {
-          document.body.removeChild(overlay);
-          doSubmit();
+        document.querySelectorAll('.image-remove').forEach(function(rm) {
+          rm.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var parent = rm.parentNode;
+            var idx = parseInt(parent.dataset.index);
+            if (idx >= 0 && idx < tempImages.length) tempImages.splice(idx, 1);
+            rebuildImages();
+          });
         });
-      }
 
-      function doSubmit() {
-        if (saving) return;
-        if (!textarea.value.trim() && images.length === 0) {
-          U.showToast('请输入内容或添加照片', 'error'); return;
+        var saving = false;
+        document.getElementById('saveContent').addEventListener('click', function() {
+          if (saving) return;
+          var charIdVal = document.getElementById('contentChar').value;
+          var textVal = document.getElementById('contentText').value;
+
+          if (!charIdVal) { U.showToast('请选择所属人物', 'error'); return; }
+
+          saving = true;
+          U.showLoading('保存中...');
+
+          var data = { characterId: charIdVal, text: textVal, images: tempImages, tags: tags };
+          var promise = isEdit ? S.updateContent(contentId, data) : S.addContent(data);
+
+          promise.then(function() {
+            U.hideLoading(); saving = false;
+            U.showToast(isEdit ? '更新成功' : '添加成功', 'success');
+            setTimeout(function() { window.history.back(); }, 600);
+          }).catch(function(e) {
+            U.hideLoading(); saving = false;
+            U.showToast(e.message || '保存失败', 'error');
+          });
+        });
+
+        document.getElementById('cancelContent').addEventListener('click', function() { window.history.back(); });
+
+        var deleteBtn = document.getElementById('deleteContent');
+        if (deleteBtn) {
+          deleteBtn.addEventListener('click', function() {
+            U.showConfirm('确认删除', '确定要删除这条内容吗？此操作不可恢复。', '确认删除', '取消').then(function() {
+              S.deleteContent(contentId).then(function() {
+                U.showToast('已删除', 'success');
+                setTimeout(function() { JYS.App.navigateTo('/contents'); }, 600);
+              });
+            }).catch(function() {});
+          });
         }
-        saving = true;
-        U.showLoading('保存中...');
-
-        var data = { characterId: selectedCharacter.id, text: textarea.value.trim(), images: images, tags: selectedTags };
-
-        try {
-          if (isEdit) { S.updateContent(contentId, data); }
-          else { S.addContent(data); }
-          U.hideLoading(); saving = false;
-          U.showToast(isEdit ? '更新成功' : '记录成功', 'success');
-          setTimeout(function() { window.history.back(); }, 600);
-        } catch (e) {
-          U.hideLoading(); saving = false;
-          U.showToast(e.message || '保存失败', 'error');
-        }
       }
-    }
-  };
+    };
+  });
 };

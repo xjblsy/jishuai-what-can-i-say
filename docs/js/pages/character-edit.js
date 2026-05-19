@@ -1,20 +1,30 @@
+var JYS = window.JYS = window.JYS || {};
+JYS.Pages = JYS.Pages || {};
+
 JYS.Pages.characterEdit = function(params) {
   var S = JYS.Storage;
   var U = JYS.Util;
   var isEdit = !!params.id;
   var characterId = params.id || '';
   var name = '', nickname = '', remark = '', avatar = '';
+  var avatarPromise = Promise.resolve();
 
   if (isEdit) {
-    var character = S.getCharacterById(characterId);
-    if (character) {
-      name = character.name || '';
-      nickname = character.nickname || '';
-      remark = character.remark || '';
-      avatar = character.avatar || '';
-    }
+    return S.getCharacterById(characterId).then(function(character) {
+      if (character) {
+        name = character.name || '';
+        nickname = character.nickname || '';
+        remark = character.remark || '';
+        avatar = character.avatar || '';
+      }
+      return buildUI(isEdit, characterId, name, nickname, remark, avatar, S, U);
+    });
   }
 
+  return buildUI(isEdit, characterId, name, nickname, remark, avatar, S, U);
+};
+
+function buildUI(isEdit, characterId, name, nickname, remark, avatar, S, U) {
   return {
     html:
       '<div class="edit-page">' +
@@ -75,9 +85,12 @@ JYS.Pages.characterEdit = function(params) {
         }).catch(function() { U.hideLoading(); U.showToast('图片处理失败', 'error'); });
       });
 
-      document.getElementById('charRemark').addEventListener('input', function() {
-        document.getElementById('remarkCounter').textContent = this.value.length + '/200';
-      });
+      var remarkEl = document.getElementById('charRemark');
+      if (remarkEl) {
+        remarkEl.addEventListener('input', function() {
+          document.getElementById('remarkCounter').textContent = this.value.length + '/200';
+        });
+      }
 
       var saving = false;
       document.getElementById('saveChar').addEventListener('click', function() {
@@ -87,20 +100,21 @@ JYS.Pages.characterEdit = function(params) {
 
         saving = true;
         U.showLoading('保存中...');
-        var data = { name: charName.trim(), nickname: document.getElementById('charNickname').value.trim(), remark: document.getElementById('charRemark').value.trim(), avatar: avatar };
 
-        setTimeout(function() {
-          try {
-            if (isEdit) { S.updateCharacter(characterId, data); }
-            else { S.addCharacter(data); }
-            U.hideLoading(); saving = false;
-            U.showToast(isEdit ? '更新成功' : '添加成功', 'success');
-            setTimeout(function() { window.history.back(); }, 600);
-          } catch (e) {
-            U.hideLoading(); saving = false;
-            U.showToast(e.message || '保存失败', 'error');
-          }
-        }, 100);
+        var data = { name: charName.trim(), nickname: document.getElementById('charNickname').value.trim(), remark: remarkEl ? remarkEl.value.trim() : '', avatar: avatar };
+
+        var promise;
+        if (isEdit) { promise = S.updateCharacter(characterId, data); }
+        else { promise = S.addCharacter(data); }
+
+        promise.then(function() {
+          U.hideLoading(); saving = false;
+          U.showToast(isEdit ? '更新成功' : '添加成功', 'success');
+          setTimeout(function() { window.history.back(); }, 600);
+        }).catch(function(e) {
+          U.hideLoading(); saving = false;
+          U.showToast(e.message || '保存失败', 'error');
+        });
       });
 
       document.getElementById('cancelChar').addEventListener('click', function() { window.history.back(); });
@@ -108,15 +122,17 @@ JYS.Pages.characterEdit = function(params) {
       var deleteBtn = document.getElementById('deleteChar');
       if (deleteBtn) {
         deleteBtn.addEventListener('click', function() {
-          var character = S.getCharacterById(characterId);
-          if (!character) return;
-          U.showConfirm('确认删除', '确定要删除「' + character.name + '」及其所有相关内容吗？此操作不可撤销。', '确认删除', '取消').then(function() {
-            S.deleteCharacter(characterId);
-            U.showToast('已删除', 'success');
-            setTimeout(function() { JYS.App.navigateTo('/characters'); }, 600);
-          }).catch(function() {});
+          S.getCharacterById(characterId).then(function(character) {
+            if (!character) return;
+            U.showConfirm('确认删除', '确定要删除「' + character.name + '」及其所有相关内容吗？此操作不可撤销。', '确认删除', '取消').then(function() {
+              S.deleteCharacter(characterId).then(function() {
+                U.showToast('已删除', 'success');
+                setTimeout(function() { JYS.App.navigateTo('/characters'); }, 600);
+              });
+            }).catch(function() {});
+          });
         });
       }
     }
   };
-};
+}
