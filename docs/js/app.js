@@ -12,8 +12,8 @@ JYS.App = {
     passwordUpdatedAt: null
   },
 
-  SUPABASE_URL: 'https://xxxxxxxxxxxx.supabase.co',
-  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+  SUPABASE_URL: 'https://wxiiojiahzvigkpwcnoz.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4aWlvamlhaHp2aWdrcHdjbm96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNjE1MTgsImV4cCI6MjA5NDczNzUxOH0.slmxtNQBgCOeNOOMYzhGIZJPd90ZH3pXRx4Jn-7CVa4',
 
   DEFAULT_PASSWORD: '',
   SESSION_DURATION_MINUTES: 1440,
