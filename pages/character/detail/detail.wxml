@@ -1,0 +1,115 @@
+<view class="detail-page" wx:if="{{character}}">
+  <view class="detail-cover">
+    <view class="detail-avatar" bindtap="onChangeAvatar">
+      <image
+        wx:if="{{character.avatar}}"
+        class="avatar-img"
+        src="{{character.avatar}}"
+        mode="aspectFill"
+      />
+      <text wx:else class="avatar-text">{{character.name[0]}}</text>
+    </view>
+    <text class="detail-name">{{character.name}}</text>
+    <text class="detail-nickname" wx:if="{{character.nickname}}">@{{character.nickname}}</text>
+
+    <view class="detail-stats">
+      <view class="detail-stat">
+        <text class="stat-num">{{contents.length}}</text>
+        <text class="stat-label">语录</text>
+      </view>
+      <view class="detail-stat">
+        <text class="stat-num">{{favoriteCount}}</text>
+        <text class="stat-label">收藏</text>
+      </view>
+      <view class="detail-stat">
+        <text class="stat-num">{{imageCount}}</text>
+        <text class="stat-label">图片</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="detail-actions">
+    <view class="detail-action-btn primary" bindtap="onAddContent">✍️ 记录语录</view>
+    <view class="detail-action-btn secondary" bindtap="onEditCharacter">✏️ 编辑信息</view>
+  </view>
+
+  <scroll-view class="filter-bar" scroll-x wx:if="{{tags.length > 0}}">
+    <text
+      class="filter-tag {{activeTag === '' ? 'active' : ''}}"
+      bindtap="onFilterTag"
+      data-tag=""
+    >全部</text>
+    <text
+      class="filter-tag {{activeTag === item ? 'active' : ''}}"
+      wx:for="{{tags}}"
+      wx:key="*this"
+      bindtap="onFilterTag"
+      data-tag="{{item}}"
+    >{{item}}</text>
+  </scroll-view>
+
+  <view class="sort-bar">
+    <text
+      class="sort-item {{sortBy === 'time' ? 'active' : ''}}"
+      bindtap="onSort"
+      data-sort="time"
+    >时间{{sortOrder === 'desc' ? '↓' : '↑'}}</text>
+  </view>
+
+  <view class="content-list">
+    <view
+      class="content-card fade-in"
+      wx:for="{{filteredContents}}"
+      wx:key="id"
+    >
+      <view class="card-time">
+        <text>{{item.formattedTime}}</text>
+        <text
+          class="{{item.isFavorite ? 'fav-active' : ''}}"
+          bindtap="onToggleFavorite"
+          data-id="{{item.id}}"
+        >{{item.isFavorite ? '⭐' : '☆'}}</text>
+      </view>
+
+      <view class="card-text" wx:if="{{item.text}}">{{item.text}}</view>
+
+      <view class="card-images" wx:if="{{item.images && item.images.length > 0}}">
+        <view
+          class="card-image"
+          wx:for="{{item.images}}"
+          wx:for-item="img"
+          wx:key="*this"
+          catchtap="onPreviewImage"
+          data-urls="{{item.images}}"
+          data-current="{{index}}"
+        >
+          <image class="image" src="{{img}}" mode="aspectFill" />
+        </view>
+      </view>
+
+      <view class="card-tags" wx:if="{{item.tags && item.tags.length > 0}}">
+        <text class="tag tag-primary" wx:for="{{item.tags}}" wx:key="*this">{{item}}</text>
+      </view>
+
+      <view class="card-footer">
+        <text bindtap="onEditContent" data-id="{{item.id}}">编辑</text>
+        <text bindtap="onDeleteContent" data-id="{{item.id}}">删除</text>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{filteredContents.length === 0}}">
+      <text class="empty-icon">📝</text>
+      <text class="empty-text" wx:if="{{activeTag}}">该标签下暂无内容</text>
+      <text class="empty-text" wx:else>还没有记录任何语录\n点击上方按钮添加</text>
+    </view>
+  </view>
+</view>
+
+<view class="empty-state" wx:else>
+  <text class="empty-icon">❓</text>
+  <text class="empty-text">人物信息不存在</text>
+</view>
+
+<view class="float-add-btn" bindtap="onAddContent" wx:if="{{character}}">
+  <text>+</text>
+</view>

@@ -1,0 +1,64 @@
+{
+  "pages": [
+    "pages/auth/auth",
+    "pages/home/home",
+    "pages/character/list/list",
+    "pages/character/detail/detail",
+    "pages/character/edit/edit",
+    "pages/content/list/list",
+    "pages/content/edit/edit",
+    "pages/favorites/favorites",
+    "pages/search/search",
+    "pages/settings/settings"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "backgroundColor": "#f5f5f5",
+    "backgroundColorTop": "#f5f5f5",
+    "backgroundColorBottom": "#f5f5f5",
+    "navigationBarBackgroundColor": "#1a1a2e",
+    "navigationBarTitleText": "集英社",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#8a8a8a",
+    "selectedColor": "#e94560",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "iconPath": "images/tab/home.png",
+        "selectedIconPath": "images/tab/home-active.png",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/character/list/list",
+        "iconPath": "images/tab/user.png",
+        "selectedIconPath": "images/tab/user-active.png",
+        "text": "人物"
+      },
+      {
+        "pagePath": "pages/favorites/favorites",
+        "iconPath": "images/tab/star.png",
+        "selectedIconPath": "images/tab/star-active.png",
+        "text": "收藏"
+      },
+      {
+        "pagePath": "pages/settings/settings",
+        "iconPath": "images/tab/settings.png",
+        "selectedIconPath": "images/tab/settings-active.png",
+        "text": "设置"
+      }
+    ]
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于小程序定位"
+    },
+    "scope.writePhotosAlbum": {
+      "desc": "保存图片到相册"
+    }
+  },
+  "sitemapLocation": "sitemap.json"
+}

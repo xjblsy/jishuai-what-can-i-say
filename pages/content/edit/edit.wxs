@@ -1,0 +1,8 @@
+function isTagSelected(tags, tag) {
+  if (!tags || !tag) return false;
+  return tags.indexOf(tag) > -1;
+}
+
+module.exports = {
+  isTagSelected: isTagSelected,
+};

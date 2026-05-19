@@ -1,0 +1,88 @@
+<view class="character-list-page">
+  <view class="search-bar">
+    <text class="search-icon">🔍</text>
+    <input
+      placeholder="搜索人物..."
+      value="{{searchKeyword}}"
+      bindinput="onSearchInput"
+      confirm-type="search"
+    />
+  </view>
+
+  <view class="view-toggle">
+    <text
+      class="{{viewMode === 'grid' ? 'active' : ''}}"
+      bindtap="onToggleView"
+      data-mode="grid"
+    >▦</text>
+    <text
+      class="{{viewMode === 'list' ? 'active' : ''}}"
+      bindtap="onToggleView"
+      data-mode="list"
+    >☰</text>
+  </view>
+
+  <view class="character-grid" wx:if="{{viewMode === 'grid' && filteredCharacters.length > 0}}">
+    <view
+      class="character-card"
+      wx:for="{{filteredCharacters}}"
+      wx:key="id"
+      bindtap="onCharacterTap"
+      bindlongpress="onCharacterLongPress"
+      data-id="{{item.id}}"
+    >
+      <view class="card-avatar">
+        <image
+          wx:if="{{item.avatar}}"
+          class="avatar-img"
+          src="{{item.avatar}}"
+          mode="aspectFill"
+        />
+        <text wx:else class="avatar-text">{{item.name[0]}}</text>
+      </view>
+      <text class="card-name">{{item.name}}</text>
+      <text class="card-nickname" wx:if="{{item.nickname}}">{{item.nickname}}</text>
+      <text class="card-count">{{item.contentCount || 0}}条</text>
+    </view>
+  </view>
+
+  <view class="list-view" wx:if="{{viewMode === 'list' && filteredCharacters.length > 0}}">
+    <view
+      class="character-item"
+      wx:for="{{filteredCharacters}}"
+      wx:key="id"
+      bindtap="onCharacterTap"
+      bindlongpress="onCharacterLongPress"
+      data-id="{{item.id}}"
+    >
+      <view class="item-avatar">
+        <image
+          wx:if="{{item.avatar}}"
+          class="avatar-img"
+          src="{{item.avatar}}"
+          mode="aspectFill"
+        />
+        <text wx:else class="avatar-text">{{item.name[0]}}</text>
+      </view>
+      <view class="item-info">
+        <text class="item-name">{{item.name}}</text>
+        <view wx:if="{{item.nickname}}">
+          <text class="item-nickname">昵称: {{item.nickname}}</text>
+        </view>
+        <text class="item-count">{{item.contentCount || 0}}条语录</text>
+      </view>
+      <text class="item-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:if="{{filteredCharacters.length === 0}}">
+    <text class="empty-icon">{{searchKeyword ? '🔍' : '👥'}}</text>
+    <text class="empty-text">
+      {{searchKeyword ? '未找到匹配的人物' : '还没有添加人物\n点击右下角 + 添加'}}
+    </text>
+  </view>
+</view>
+
+<view class="float-add-btn" bindtap="onAddCharacter">
+  <text>+</text>
+</view>

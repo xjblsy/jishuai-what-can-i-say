@@ -1,0 +1,58 @@
+<view class="favorites-page">
+  <view class="page-header" wx:if="{{favorites.length > 0}}">
+    <text class="header-count">共 {{favorites.length}} 条收藏</text>
+    <view class="header-actions">
+      <text bindtap="onExportFavorites">导出</text>
+    </view>
+  </view>
+
+  <view wx:if="{{favorites.length > 0}}">
+    <view class="fav-item fade-in" wx:for="{{favorites}}" wx:key="id">
+      <view class="item-header" bindtap="onCharacterTap" data-id="{{item.characterId}}">
+        <view class="header-avatar">
+          <image
+            wx:if="{{item.characterAvatar}}"
+            class="avatar-img"
+            src="{{item.characterAvatar}}"
+            mode="aspectFill"
+          />
+          <text wx:else class="avatar-text">{{item.characterName[0]}}</text>
+        </view>
+        <text class="header-name">{{item.characterName}}</text>
+        <text class="header-time">{{item.formattedTime}}</text>
+      </view>
+
+      <view class="item-text" wx:if="{{item.text}}">{{item.text}}</view>
+
+      <view class="item-images" wx:if="{{item.images && item.images.length > 0}}">
+        <view
+          class="item-image"
+          wx:for="{{item.images}}"
+          wx:for-item="img"
+          wx:key="*this"
+          catchtap="onPreviewImage"
+          data-urls="{{item.images}}"
+          data-current="{{index}}"
+        >
+          <image class="image" src="{{img}}" mode="aspectFill" />
+        </view>
+      </view>
+
+      <view class="item-tags" wx:if="{{item.tags && item.tags.length > 0}}">
+        <text class="tag tag-primary" wx:for="{{item.tags}}" wx:key="*this">{{item}}</text>
+      </view>
+
+      <view class="item-footer">
+        <text class="unfav-btn" bindtap="onUnfavorite" data-id="{{item.id}}">⭐ 已收藏</text>
+        <view class="action-btns">
+          <text bindtap="onEditContent" data-id="{{item.id}}" data-character-id="{{item.characterId}}">编辑</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:else>
+    <text class="empty-icon">⭐</text>
+    <text class="empty-text">还没有收藏任何内容\n点击语录旁的☆即可收藏</text>
+  </view>
+</view>
