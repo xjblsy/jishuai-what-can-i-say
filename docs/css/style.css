@@ -308,7 +308,9 @@ body.auth-body #app {
   color: #fff;
   transition: all 0.3s ease;
   -webkit-appearance: none;
-  appearance: none;
+  -webkit-user-select: text;
+  user-select: text;
+  cursor: text;
 }
 .auth-input.single {
   margin-top: 0;
