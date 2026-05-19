@@ -91,7 +91,13 @@ JYS.Util = {
     }
     var overlay = document.createElement('div');
     overlay.className = 'loading-overlay';
-    overlay.innerHTML = '<div class="loading-spinner"></div><div class="loading-text">' + JYS.Util.escapeHtml(msg) + '</div>';
+    var spinner = document.createElement('div');
+    spinner.className = 'loading-spinner';
+    var text = document.createElement('div');
+    text.className = 'loading-text';
+    text.textContent = msg;
+    overlay.appendChild(spinner);
+    overlay.appendChild(text);
     document.body.appendChild(overlay);
   },
 

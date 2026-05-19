@@ -103,6 +103,14 @@ JYS.Storage = {
         }
       }
       keys.forEach(function(k) { localStorage.removeItem(k); });
+
+      var logs = localStorage.getItem('jys_activity_logs');
+      if (logs) {
+        var parsed = JSON.parse(logs);
+        if (parsed.length > 100) {
+          localStorage.setItem('jys_activity_logs', JSON.stringify(parsed.slice(-100)));
+        }
+      }
     } catch (e) {}
   },
 

@@ -33,6 +33,9 @@ function renderSupabaseAuth(App, S, C, U) {
       isLocked = true;
       var remaining = Math.ceil((lockEndTime - Date.now()) / 60000);
       errorMsg = '账户已锁定，请 ' + remaining + ' 分钟后重试';
+    } else if (lockEndTime && Date.now() >= lockEndTime) {
+      try { localStorage.removeItem('jys_auth_lock_end'); } catch (ex) {}
+      try { localStorage.removeItem('jys_auth_attempts'); } catch (ex) {}
     }
   } catch (e) {}
 

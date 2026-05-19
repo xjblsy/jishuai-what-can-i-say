@@ -158,6 +158,11 @@ JYS.App = {
         this.globalData.isAuth = true;
         this.globalData.sessionToken = token;
         this.globalData.authExpireTime = parseInt(expire);
+      } else if (token) {
+        localStorage.removeItem('jys_session');
+        localStorage.removeItem('jys_session_expire');
+        this.globalData.isAuth = false;
+        this.globalData.sessionToken = null;
       }
     } catch (e) {}
   },

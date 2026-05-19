@@ -80,6 +80,7 @@ img {
   }
 }
 
+/* ============ AUTH BODY BASE ============ */
 body.auth-body {
   background: linear-gradient(
     170deg,
@@ -88,6 +89,13 @@ body.auth-body {
     #1a1a2e 60%,
     #16213e 100%
   );
+  min-height: 100vh;
+}
+body.auth-body #app {
+  background: transparent;
+  box-shadow: none;
+  max-width: 100%;
+  min-height: 100vh;
 }
 
 /* Image Preview */
@@ -267,10 +275,14 @@ body.auth-body {
 .auth-form {
   width: 100%;
   max-width: 380px;
-  z-index: 1;
+  z-index: 10;
+  position: relative;
+  pointer-events: auto;
 }
 .input-group {
   margin-bottom: 20px;
+  position: relative;
+  pointer-events: auto;
 }
 .input-label {
   display: block;
@@ -291,6 +303,8 @@ body.auth-body {
   color: #fff;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
+  position: relative;
+  pointer-events: auto;
 }
 .auth-input.single {
   margin-top: 0;
@@ -2705,6 +2719,3 @@ body.auth-body {
   transition: all 0.2s;
 }
 .app-back-btn:hover { transform: scale(1.06); }
-
-.auth-body { background: #1a1a2e; }
-.auth-body #app { max-width: 100%; background: transparent; box-shadow: none; }
