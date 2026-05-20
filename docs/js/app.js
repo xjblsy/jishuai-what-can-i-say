@@ -1,4 +1,4 @@
-var JYS = window.JYS = window.JYS || {};
+var JYS = window.JYS = window.JYS || {}; // v2.1-fix
 
 JYS.App = {
   globalData: {
