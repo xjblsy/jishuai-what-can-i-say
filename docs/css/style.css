@@ -171,6 +171,8 @@ body.auth-body #app {
   align-items: center;
   justify-content: center;
   padding: 40px 16px;
+  position: relative;
+  z-index: 1;
 }
 .auth-card {
   width: 100%;
@@ -179,6 +181,8 @@ body.auth-body #app {
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   padding: 48px 40px 40px;
+  position: relative;
+  z-index: 1;
 }
 .auth-system-title {
   font-size: 32px;
@@ -212,9 +216,18 @@ body.auth-body #app {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
 }
 .auth-form input {
   display: block;
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
+  cursor: text;
+  -webkit-user-select: text;
+  user-select: text;
 }
 .auth-btn {
   width: 100%;

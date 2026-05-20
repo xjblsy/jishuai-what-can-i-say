@@ -204,7 +204,8 @@ JYS.App = {
   checkScreenSize: function() {
     this.globalData.isMobile = window.innerWidth < 768;
     if (document.body) {
-      document.body.className = this.globalData.isMobile ? 'mobile' : 'desktop';
+      document.body.classList.remove('mobile', 'desktop');
+      document.body.classList.add(this.globalData.isMobile ? 'mobile' : 'desktop');
     }
   },
 
@@ -448,6 +449,12 @@ JYS.App = {
   _renderHTML: function(appEl, result, pageName, params) {
     if (!result || !result.html) return;
 
+    if (pageName === 'auth') {
+      document.body.classList.add('auth-body');
+    } else {
+      document.body.classList.remove('auth-body');
+    }
+
     appEl.innerHTML = this._sanitizeHTML(result.html);
 
     if (result.onCleanup) {
@@ -465,12 +472,6 @@ JYS.App = {
 
     if (pageName !== 'auth' && pageName !== 'home') {
       this.renderBackButton(appEl, pageName);
-    }
-
-    if (pageName === 'auth') {
-      document.body.classList.add('auth-body');
-    } else {
-      document.body.classList.remove('auth-body');
     }
   },
 

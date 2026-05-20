@@ -59,8 +59,8 @@ function renderAuth(App, S, C, U) {
       '<div class="auth-system-title">集英社</div>' +
       '<div class="auth-tab-heading">账号登录</div>' +
       '<div class="auth-form">' +
-      '<input id="authUsername" type="text" style="' + INP_STYLE + '" placeholder="请输入用户名" autocomplete="username" tabindex="1" />' +
-      '<input id="authPassword" type="password" style="' + INP_STYLE + '" placeholder="请输入密码" maxlength="128" autocomplete="current-password" tabindex="2" />' +
+      '<input id="authUsername" class="auth-input" type="text" style="' + INP_STYLE + '" placeholder="请输入用户名" autocomplete="username" tabindex="1" />' +
+      '<input id="authPassword" class="auth-input" type="password" style="' + INP_STYLE + '" placeholder="请输入密码" maxlength="128" autocomplete="current-password" tabindex="2" />' +
       '<button class="auth-btn' + (isLocked ? ' disabled' : '') + '" id="authBtn">' + (isLocked ? '账户已锁定' : '登 录') + '</button>' +
       '<div class="auth-error" id="authError"' + (errorMsg ? '' : ' style="display:none"') + '>' +
       (errorMsg ? '<span class="error-icon">!</span>' + U.escapeHtml(errorMsg) : '') +
