@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Input Test</title>
+  <style>
+    body { background:#f0f2f5; min-height:100vh; display:flex; align-items:center; justify-content:center; font-family:sans-serif; }
+    .card { background:#fff; border-radius:8px; box-shadow:0 2px 12px rgba(0,0,0,.08); padding:48px 40px 40px; width:420px; text-align:center; }
+    h1 { font-size:28px; color:#1a1a2e; margin-bottom:30px; }
+    input { width:100%; height:50px; padding:0 16px; font-size:16px; color:#333; border:1px solid #dcdcdc; border-radius:4px; outline:none; background:#fff; box-sizing:border-box; text-align:center; margin-bottom:16px; }
+    input:focus { border-color:#144893; box-shadow:0 0 0 3px rgba(20,72,147,.1); }
+    button { width:100%; height:50px; border-radius:4px; font-size:17px; font-weight:600; background:#144893; color:#fff; border:none; letter-spacing:4px; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>输入测试</h1>
+    <input type="text" id="testUser" placeholder="请输入用户名" autocomplete="off" />
+    <input type="password" id="testPass" placeholder="请输入密码" autocomplete="off" />
+    <button id="testBtn">测 试</button>
+    <div id="testResult" style="color:#d32f2f;margin-top:16px;min-height:20px;"></div>
+  </div>
+  <script>
+    document.getElementById('testUser').addEventListener('input', function() {
+      document.getElementById('testResult').textContent = '已输入: ' + this.value.length + ' 个字符';
+    });
+    document.getElementById('testPass').addEventListener('input', function() {
+      document.getElementById('testResult').textContent = '密码已输入: ' + this.value.length + ' 个字符';
+    });
+    document.getElementById('testBtn').addEventListener('click', function() {
+      var u = document.getElementById('testUser').value;
+      var p = document.getElementById('testPass').value;
+      document.getElementById('testResult').textContent = '用户名=' + u + ' 密码=' + p;
+    });
+  </script>
+</body>
+</html>
