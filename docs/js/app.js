@@ -194,8 +194,8 @@ JYS.App = {
   _sanitizeHTML: function(html) {
     if (!html) return '';
     var result = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-               .replace(/on\w+\s*=\s*"[^"]*"/gi, '')
-               .replace(/on\w+\s*=\s*'[^']*'/gi, '')
+               .replace(/onerror\s*=\s*"[^"]*"/gi, '')
+               .replace(/onerror\s*=\s*'[^']*'/gi, '')
                .replace(/javascript\s*:/gi, '')
                .replace(/<embed\b[^>]*>/gi, '')
                .replace(/<object\b[^>]*>/gi, '');

@@ -189,7 +189,8 @@ JYS.Storage = {
         return self._supabase
           .from('characters').insert({
             name: character.name,
-            name_pinyin: character.namePinyin || '',
+            nickname: character.nickname || '',
+            remark: character.remark || '',
             avatar: character.avatar || '',
             description: character.description || '',
             category: character.category || '',
@@ -215,7 +216,8 @@ JYS.Storage = {
     var newChar = {
       id: this._generateLocalId(),
       name: character.name,
-      namePinyin: character.namePinyin || '',
+      nickname: character.nickname || '',
+      remark: character.remark || '',
       avatar: character.avatar || '',
       description: character.description || '',
       category: character.category || '',
@@ -242,7 +244,8 @@ JYS.Storage = {
       var op = function() {
         var supabaseUpdates = {
           name: updates.name,
-          name_pinyin: updates.namePinyin || '',
+          nickname: updates.nickname || '',
+          remark: updates.remark || '',
           avatar: updates.avatar || '',
           description: updates.description || '',
           category: updates.category || '',
@@ -378,6 +381,7 @@ JYS.Storage = {
           date: content.date || new Date().toISOString(),
           tags: (content.tags || []).slice(0, self.MAX_TAGS_PER_CONTENT),
           location: content.location || '',
+          images: JSON.stringify(content.images || []),
           is_favorite: !!content.isFavorite,
           created_at: new Date().toISOString()
         }).select().single()
@@ -402,6 +406,7 @@ JYS.Storage = {
       date: content.date || new Date().toISOString(),
       tags: (content.tags || []).slice(0, this.MAX_TAGS_PER_CONTENT),
       location: content.location || '',
+      images: content.images || [],
       isFavorite: !!content.isFavorite,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -427,6 +432,7 @@ JYS.Storage = {
           date: updates.date,
           tags: (updates.tags || []).slice(0, self.MAX_TAGS_PER_CONTENT),
           location: updates.location || '',
+          images: JSON.stringify(updates.images || []),
           is_favorite: updates.isFavorite,
           updated_at: new Date().toISOString()
         };
@@ -699,9 +705,10 @@ JYS.Storage = {
     return {
       id: c.id,
       name: c.name || '',
-      namePinyin: c.name_pinyin || c.namePinyin || '',
+      nickname: c.nickname || c.name_pinyin || '',
+      remark: c.remark || c.description || '',
       avatar: c.avatar || '',
-      description: c.description || '',
+      description: c.description || c.remark || '',
       category: c.category || '',
       extra1: c.extra_1 || c.extra1 || '',
       extra2: c.extra_2 || c.extra2 || '',
@@ -714,6 +721,16 @@ JYS.Storage = {
 
   normalizeContent: function(c) {
     if (!c) return c;
+    var images = [];
+    try {
+      if (c.images) {
+        if (typeof c.images === 'string') {
+          images = JSON.parse(c.images);
+        } else {
+          images = c.images;
+        }
+      }
+    } catch (e) { images = []; }
     return {
       id: c.id,
       characterId: c.character_id || c.characterId || null,
@@ -722,6 +739,7 @@ JYS.Storage = {
       date: c.date || null,
       tags: c.tags || [],
       location: c.location || '',
+      images: images,
       isFavorite: !!c.is_favorite || !!c.isFavorite || false,
       createdAt: c.created_at || c.createdAt || new Date().toISOString(),
       updatedAt: c.updated_at || c.updatedAt || new Date().toISOString()

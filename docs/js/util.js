@@ -61,6 +61,27 @@ JYS.Util = {
     return text.substring(0, maxLen - suffix.length) + suffix;
   },
 
+  formatTime: function(dateStr) {
+    if (!dateStr) return '';
+    try {
+      var d = new Date(dateStr);
+      if (isNaN(d.getTime())) return '';
+      var year = d.getFullYear();
+      var month = String(d.getMonth() + 1).padStart(2, '0');
+      var day = String(d.getDate()).padStart(2, '0');
+      var hour = String(d.getHours()).padStart(2, '0');
+      var min = String(d.getMinutes()).padStart(2, '0');
+      var now = new Date();
+      if (year === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate()) {
+        return hour + ':' + min;
+      }
+      if (year === now.getFullYear()) {
+        return month + '-' + day + ' ' + hour + ':' + min;
+      }
+      return year + '-' + month + '-' + day;
+    } catch (e) { return ''; }
+  },
+
   formatTimeAgo: function(dateStr) {
     if (!dateStr) return '';
     try {
