@@ -193,12 +193,17 @@ JYS.App = {
 
   _sanitizeHTML: function(html) {
     if (!html) return '';
-    return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    var result = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
                .replace(/on\w+\s*=\s*"[^"]*"/gi, '')
                .replace(/on\w+\s*=\s*'[^']*'/gi, '')
                .replace(/javascript\s*:/gi, '')
                .replace(/<embed\b[^>]*>/gi, '')
                .replace(/<object\b[^>]*>/gi, '');
+    result = result.replace(/(<[^>]+)\s+style\s*=\s*"([^"]*)"/gi, function(match, tag, value) {
+      var clean = value.replace(/\s*javascript\s*:\s*/gi, ' x-javascript-blocked:').replace(/expression\s*\(/gi, ' x-expression-blocked(').replace(/url\s*\(\s*["']?\s*javascript:/gi, ' url(x-javascript-blocked:');
+      return tag + ' style="' + clean + '"';
+    });
+    return result;
   },
 
   checkScreenSize: function() {
