@@ -54,7 +54,10 @@ function renderSupabaseAuth(App, S, C, U) {
         '</div>' +
         '<div class="input-group" id="pwdGroup">' +
         '<label class="input-label">密码</label>' +
+        '<div class="password-input-wrapper">' +
         '<input id="authPassword" class="auth-input" type="password" placeholder="' + (isRegister ? '设置登录密码' : '输入密码') + '" maxlength="128" autocomplete="current-password" tabindex="2" />' +
+        '<span class="password-toggle" id="pwdToggle">👁</span>' +
+        '</div>' +
         '</div>' +
         (isRegister ? '<div class="input-group" id="pwdStrengthGroup">' +
         '<div class="password-strength-info">' +
@@ -82,6 +85,7 @@ function renderSupabaseAuth(App, S, C, U) {
         var authBtn = document.getElementById('authBtn');
         var authError = document.getElementById('authError');
         var authSwitch = document.getElementById('authSwitch');
+        var pwdToggle = document.getElementById('pwdToggle');
         if (usernameInput) {
           usernameInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(20,72,147,0.6)'; this.style.background = '#f0f5ff'; });
           usernameInput.addEventListener('blur', function() { this.style.borderColor = '#ddd'; this.style.background = '#f7f7f7'; });
@@ -89,6 +93,17 @@ function renderSupabaseAuth(App, S, C, U) {
         if (pwdInput) {
           pwdInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(20,72,147,0.6)'; this.style.background = '#f0f5ff'; });
           pwdInput.addEventListener('blur', function() { this.style.borderColor = '#ddd'; this.style.background = '#f7f7f7'; });
+        }
+        if (pwdToggle) {
+          pwdToggle.addEventListener('click', function() {
+            if (pwdInput.type === 'password') {
+              pwdInput.type = 'text';
+              pwdToggle.textContent = '🙈';
+            } else {
+              pwdInput.type = 'password';
+              pwdToggle.textContent = '👁';
+            }
+          });
         }
         var confirmInput = document.getElementById('authConfirm');
         if (confirmInput) {
@@ -247,7 +262,10 @@ function renderLocalAuth(App, S, C, U) {
       '</div>' +
       '<div class="input-group">' +
       '<label class="input-label">密码</label>' +
+      '<div class="password-input-wrapper">' +
       '<input id="authPassword" class="auth-input" type="password" placeholder="' + (hasAccount ? '输入密码' : '设置密码（默认：jishuai@91）') + '" maxlength="128" autocomplete="current-password" tabindex="2" />' +
+      '<span class="password-toggle" id="pwdToggle">👁</span>' +
+      '</div>' +
       '</div>' +
       (!hasAccount ? '<div class="input-group" id="pwdStrengthGroup">' +
       '<div class="password-strength-info">' +
@@ -277,6 +295,7 @@ function renderLocalAuth(App, S, C, U) {
       var authBtn = document.getElementById('authBtn');
       var authError = document.getElementById('authError');
       var attemptHint = document.getElementById('attemptHint');
+      var pwdToggle = document.getElementById('pwdToggle');
       if (usernameInput) {
         usernameInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(20,72,147,0.6)'; this.style.background = '#f0f5ff'; });
         usernameInput.addEventListener('blur', function() { this.style.borderColor = '#ddd'; this.style.background = '#f7f7f7'; });
@@ -284,6 +303,17 @@ function renderLocalAuth(App, S, C, U) {
       if (pwdInput) {
         pwdInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(20,72,147,0.6)'; this.style.background = '#f0f5ff'; });
         pwdInput.addEventListener('blur', function() { this.style.borderColor = '#ddd'; this.style.background = '#f7f7f7'; });
+      }
+      if (pwdToggle) {
+        pwdToggle.addEventListener('click', function() {
+          if (pwdInput.type === 'password') {
+            pwdInput.type = 'text';
+            pwdToggle.textContent = '🙈';
+          } else {
+            pwdInput.type = 'password';
+            pwdToggle.textContent = '👁';
+          }
+        });
       }
       var confirmInput = document.getElementById('authConfirm');
       if (confirmInput) {
