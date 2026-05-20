@@ -31,7 +31,6 @@ function renderSupabaseAuth(App, S, C, U) {
       try { localStorage.removeItem('jys_auth_attempts'); } catch (ex) {}
     }
   } catch (e) {}
-  var INP_STYLE = 'width:100%;height:52px;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);border-radius:14px;padding:0 18px;font-size:16px;color:#fff;outline:none;box-sizing:border-box;caret-color:#fff;cursor:text;user-select:text;-webkit-user-select:text;position:relative;z-index:100';
   function buildForm() {
     var btnText = isRegister ? '注册账户' : '登录';
     var switchText = isRegister ? '已有账户？去登录' : '没有账户？去注册';
@@ -44,20 +43,18 @@ function renderSupabaseAuth(App, S, C, U) {
         '<div class="auth-orb auth-orb-2"></div>' +
         '<div class="auth-orb auth-orb-3"></div>' +
         '</div>' +
-        '<div class="auth-header">' +
-        '<div class="auth-logo"><span class="logo-icon">英</span></div>' +
-        '<div class="auth-title">集英社</div>' +
-        '<div class="auth-subtitle">' + U.escapeHtml(titleText) + '</div>' +
-        '</div>' +
+        '<div class="auth-card">' +
+        '<div class="auth-system-title">集英社</div>' +
+        '<div class="auth-tab-heading">' + U.escapeHtml(titleText) + '</div>' +
         '<div class="auth-form">' +
         '<div class="input-group" id="usernameGroup">' +
         '<label class="input-label">用户名</label>' +
-        '<input id="authUsername" type="text" style="' + INP_STYLE + '" placeholder="' + (isRegister ? '设置您的用户名' : '输入用户名') + '" autocomplete="username" tabindex="1" />' +
+        '<input id="authUsername" class="auth-input" type="text" placeholder="' + (isRegister ? '设置您的用户名' : '输入用户名') + '" autocomplete="username" tabindex="1" />' +
         (isRegister ? '<div class="input-hint">用于登录，可包含字母、数字、下划线</div>' : '') +
         '</div>' +
         '<div class="input-group" id="pwdGroup">' +
         '<label class="input-label">密码</label>' +
-        '<input id="authPassword" type="password" style="' + INP_STYLE + '" placeholder="' + (isRegister ? '设置登录密码' : '输入密码') + '" maxlength="128" autocomplete="current-password" tabindex="2" />' +
+        '<input id="authPassword" class="auth-input" type="password" placeholder="' + (isRegister ? '设置登录密码' : '输入密码') + '" maxlength="128" autocomplete="current-password" tabindex="2" />' +
         '</div>' +
         (isRegister ? '<div class="input-group" id="pwdStrengthGroup">' +
         '<div class="password-strength-info">' +
@@ -67,7 +64,7 @@ function renderSupabaseAuth(App, S, C, U) {
         '</div>' : '') +
         (isRegister ? '<div class="input-group" id="confirmGroup">' +
         '<label class="input-label">确认密码</label>' +
-        '<input id="authConfirm" type="password" style="' + INP_STYLE + '" placeholder="再次输入密码" maxlength="128" autocomplete="new-password" tabindex="3" />' +
+        '<input id="authConfirm" class="auth-input" type="password" placeholder="再次输入密码" maxlength="128" autocomplete="new-password" tabindex="3" />' +
         '</div>' : '') +
         '<div class="auth-btn' + (isLocked ? ' disabled' : '') + '" id="authBtn">' + (isLocked ? '账户已锁定' : btnText) + '</div>' +
         '<div class="auth-error" id="authError"' + (errorMsg ? '' : ' style="display:none"') + '>' +
@@ -76,6 +73,7 @@ function renderSupabaseAuth(App, S, C, U) {
         '<div class="auth-switch" id="authSwitch">' + U.escapeHtml(switchText) + '</div>' +
         '</div>' +
         '<div class="auth-footer"><span>集英社 v2.1 · 安全加密传输</span></div>' +
+        '</div>' +
         '</div>',
       onRender: function() {
         if (isLocked) return;
@@ -85,63 +83,45 @@ function renderSupabaseAuth(App, S, C, U) {
         var authError = document.getElementById('authError');
         var authSwitch = document.getElementById('authSwitch');
         if (usernameInput) {
-          usernameInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(233,69,96,0.6)'; this.style.background = 'rgba(255,255,255,0.15)'; this.style.boxShadow = '0 0 0 4px rgba(233,69,96,0.1)'; });
-          usernameInput.addEventListener('blur', function() { this.style.borderColor = ''; this.style.background = ''; this.style.boxShadow = ''; });
+          usernameInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(20,72,147,0.6)'; this.style.background = '#f0f5ff'; });
+          usernameInput.addEventListener('blur', function() { this.style.borderColor = '#ddd'; this.style.background = '#f7f7f7'; });
         }
         if (pwdInput) {
-          pwdInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(233,69,96,0.6)'; this.style.background = 'rgba(255,255,255,0.15)'; this.style.boxShadow = '0 0 0 4px rgba(233,69,96,0.1)'; });
-          pwdInput.addEventListener('blur', function() { this.style.borderColor = ''; this.style.background = ''; this.style.boxShadow = ''; });
+          pwdInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(20,72,147,0.6)'; this.style.background = '#f0f5ff'; });
+          pwdInput.addEventListener('blur', function() { this.style.borderColor = '#ddd'; this.style.background = '#f7f7f7'; });
         }
         var confirmInput = document.getElementById('authConfirm');
         if (confirmInput) {
-          confirmInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(233,69,96,0.6)'; this.style.background = 'rgba(255,255,255,0.15)'; this.style.boxShadow = '0 0 0 4px rgba(233,69,96,0.1)'; });
-          confirmInput.addEventListener('blur', function() { this.style.borderColor = ''; this.style.background = ''; this.style.boxShadow = ''; });
+          confirmInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(20,72,147,0.6)'; this.style.background = '#f0f5ff'; });
+          confirmInput.addEventListener('blur', function() { this.style.borderColor = '#ddd'; this.style.background = '#f7f7f7'; });
         }
         if (isRegister && usernameInput) {
-          usernameInput.addEventListener('input', function() {
-            validateUsername(usernameInput.value);
-          });
+          usernameInput.addEventListener('input', function() { validateUsername(usernameInput.value); });
         }
         if (isRegister && pwdInput) {
-          pwdInput.addEventListener('input', function() {
-            updateStrength(pwdInput.value);
-          });
+          pwdInput.addEventListener('input', function() { updateStrength(pwdInput.value); });
         }
         authBtn.addEventListener('click', function() { doAction(); });
         if (usernameInput) {
-          usernameInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') pwdInput.focus();
-          });
+          usernameInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') pwdInput.focus(); });
         }
-        pwdInput.addEventListener('keydown', function(e) {
-          if (e.key === 'Enter') doAction();
-        });
-        authSwitch.addEventListener('click', function() {
-          isRegister = !isRegister;
-          JYS.Pages.auth();
-        });
+        pwdInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') doAction(); });
+        authSwitch.addEventListener('click', function() { isRegister = !isRegister; JYS.Pages.auth(); });
         function validateUsername(username) {
           var group = document.getElementById('usernameGroup');
           if (!group) return;
           var hint = group.querySelector('.input-hint');
           if (!hint) return;
           if (username.length === 0) {
-            hint.textContent = '用于登录，可包含字母、数字、下划线';
-            hint.style.color = 'rgba(255,255,255,0.4)';
-            return;
+            hint.textContent = '用于登录，可包含字母、数字、下划线'; hint.style.color = '#999'; return;
           }
           if (username.length < 3) {
-            hint.textContent = '用户名至少3个字符';
-            hint.style.color = '#ff6b6b';
-            return;
+            hint.textContent = '用户名至少3个字符'; hint.style.color = '#d32f2f'; return;
           }
           if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-            hint.textContent = '仅支持字母、数字和下划线';
-            hint.style.color = '#ff6b6b';
-            return;
+            hint.textContent = '仅支持字母、数字和下划线'; hint.style.color = '#d32f2f'; return;
           }
-          hint.textContent = '✓ 用户名可用';
-          hint.style.color = '#4caf50';
+          hint.textContent = '✓ 用户名可用'; hint.style.color = '#4caf50';
         }
         function doAction() {
           if (isLocked) return;
@@ -158,7 +138,7 @@ function renderSupabaseAuth(App, S, C, U) {
             authBtn.classList.add('disabled');
             authBtn.textContent = '创建中...';
             var defaultEmail = username + '@jishuai.local';
-            App.registerWithSupabase(defaultEmail, password, username).then(function(result) {
+            App.registerWithSupabase(defaultEmail, password, username).then(function() {
               clearLockState();
               U.showToast('账户创建成功', 'success');
               setTimeout(function() { App.navigateTo('/home'); }, 400);
@@ -174,7 +154,7 @@ function renderSupabaseAuth(App, S, C, U) {
             if (!password) { showError('请输入密码'); return; }
             authBtn.classList.add('disabled');
             authBtn.textContent = '登录中...';
-            App.loginWithSupabase(username, password).then(function(result) {
+            App.loginWithSupabase(username, password).then(function() {
               clearLockState();
               U.showToast('登录成功', 'success');
               setTimeout(function() { App.navigateTo('/home'); }, 400);
@@ -190,10 +170,7 @@ function renderSupabaseAuth(App, S, C, U) {
   }
   function showError(msg) {
     var el = document.getElementById('authError');
-    if (el) {
-      el.style.display = 'block';
-      el.innerHTML = '<span class="error-icon">⚠️</span>' + U.escapeHtml(msg);
-    }
+    if (el) { el.style.display = 'flex'; el.innerHTML = '<span class="error-icon">⚠️</span>' + U.escapeHtml(msg); }
   }
   function handleFailed(e) {
     showError(e.message || '操作失败，请重试');
@@ -209,26 +186,20 @@ function renderSupabaseAuth(App, S, C, U) {
     if (navigator.vibrate) navigator.vibrate(100);
   }
   function clearLockState() {
-    try {
-      localStorage.removeItem('jys_auth_attempts');
-      localStorage.removeItem('jys_auth_lock_end');
-    } catch (e) {}
+    try { localStorage.removeItem('jys_auth_attempts'); localStorage.removeItem('jys_auth_lock_end'); } catch (e) {}
   }
   function updateStrength(pwd) {
     var bar = document.getElementById('strengthBar');
     var label = document.getElementById('strengthLabel');
     if (!bar || !label) return;
     var result = C.getPasswordStrengthLabel(pwd);
-    var score = result.score;
-    var maxScore = 6;
-    var percent = Math.min(100, (score / maxScore) * 100);
+    var percent = Math.min(100, (result.score / 6) * 100);
     bar.style.width = percent + '%';
     bar.style.backgroundColor = result.color;
     label.textContent = result.label;
     label.style.color = result.color;
   }
-  var form = buildForm();
-  return form;
+  return buildForm();
 }
 function renderLocalAuth(App, S, C, U) {
   var MAX_ATTEMPTS = 5;
@@ -248,19 +219,16 @@ function renderLocalAuth(App, S, C, U) {
     errorMsg = '账户已锁定，请 ' + remainMin + ' 分钟后重试';
   }
   var hasAccount = false;
-  var storedHash = '';
-  var storedSalt = '';
-  var storedUsername = '';
+  var storedHash = '', storedSalt = '', storedUsername = '';
   try {
-    storedHash = localStorage.getItem('jys_password_hash');
-    storedSalt = localStorage.getItem('jys_password_salt');
+    storedHash = localStorage.getItem('jys_password_hash') || '';
+    storedSalt = localStorage.getItem('jys_password_salt') || '';
     storedUsername = localStorage.getItem('jys_username') || '';
     hasAccount = !!(storedHash && storedSalt);
   } catch (e) {}
   var isRegister = !hasAccount;
   var titleText = hasAccount ? '欢迎回来' : '创建账户';
   var btnText = hasAccount ? '登录' : '创建账户';
-  var INP_STYLE = 'width:100%;height:52px;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);border-radius:14px;padding:0 18px;font-size:16px;color:#fff;outline:none;box-sizing:border-box;caret-color:#fff;cursor:text;user-select:text;-webkit-user-select:text;position:relative;z-index:100';
   return {
     html:
       '<div class="auth-page">' +
@@ -269,19 +237,17 @@ function renderLocalAuth(App, S, C, U) {
       '<div class="auth-orb auth-orb-2"></div>' +
       '<div class="auth-orb auth-orb-3"></div>' +
       '</div>' +
-      '<div class="auth-header">' +
-      '<div class="auth-logo"><span class="logo-icon">英</span></div>' +
-      '<div class="auth-title">集英社</div>' +
-      '<div class="auth-subtitle">' + U.escapeHtml(titleText) + '</div>' +
-      '</div>' +
+      '<div class="auth-card">' +
+      '<div class="auth-system-title">集英社</div>' +
+      '<div class="auth-tab-heading">' + U.escapeHtml(titleText) + '</div>' +
       '<div class="auth-form">' +
       '<div class="input-group">' +
       '<label class="input-label">用户名</label>' +
-      '<input id="authUsername" type="text" style="' + INP_STYLE + '" placeholder="' + (hasAccount ? '输入用户名' : '设置用户名') + '" autocomplete="username" tabindex="1" />' +
+      '<input id="authUsername" class="auth-input" type="text" placeholder="' + (hasAccount ? '输入用户名' : '设置用户名') + '" autocomplete="username" tabindex="1" />' +
       '</div>' +
       '<div class="input-group">' +
       '<label class="input-label">密码</label>' +
-      '<input id="authPassword" type="password" style="' + INP_STYLE + '" placeholder="' + (hasAccount ? '输入密码' : '设置密码（默认：jishuai@91）') + '" maxlength="128" autocomplete="current-password" tabindex="2" />' +
+      '<input id="authPassword" class="auth-input" type="password" placeholder="' + (hasAccount ? '输入密码' : '设置密码（默认：jishuai@91）') + '" maxlength="128" autocomplete="current-password" tabindex="2" />' +
       '</div>' +
       (!hasAccount ? '<div class="input-group" id="pwdStrengthGroup">' +
       '<div class="password-strength-info">' +
@@ -291,7 +257,7 @@ function renderLocalAuth(App, S, C, U) {
       '</div>' +
       '<div class="input-group">' +
       '<label class="input-label">确认密码</label>' +
-      '<input id="authConfirm" type="password" style="' + INP_STYLE + '" placeholder="再次输入密码" maxlength="128" autocomplete="new-password" tabindex="3" />' +
+      '<input id="authConfirm" class="auth-input" type="password" placeholder="再次输入密码" maxlength="128" autocomplete="new-password" tabindex="3" />' +
       '</div>' : '') +
       '<div class="auth-btn' + (locked ? ' disabled' : '') + '" id="authBtn">' + (locked ? '账户已锁定' : btnText) + '</div>' +
       '<div class="auth-error" id="authError"' + (errorMsg ? '' : ' style="display:none"') + '>' +
@@ -301,7 +267,9 @@ function renderLocalAuth(App, S, C, U) {
       '剩余尝试次数: ' + remainingAttempts + ' 次' +
       '</div>' +
       '</div>' +
-      '<div class="auth-footer"><span>集英社 v2.1 · 本地加密存储</span></div>',
+      '<div class="auth-footer"><span>集英社 v2.1 · 本地加密存储</span></div>' +
+      '</div>' +
+      '</div>',
     onRender: function() {
       if (locked) return;
       var usernameInput = document.getElementById('authUsername');
@@ -310,38 +278,32 @@ function renderLocalAuth(App, S, C, U) {
       var authError = document.getElementById('authError');
       var attemptHint = document.getElementById('attemptHint');
       if (usernameInput) {
-        usernameInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(233,69,96,0.6)'; this.style.background = 'rgba(255,255,255,0.15)'; this.style.boxShadow = '0 0 0 4px rgba(233,69,96,0.1)'; });
-        usernameInput.addEventListener('blur', function() { this.style.borderColor = ''; this.style.background = ''; this.style.boxShadow = ''; });
+        usernameInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(20,72,147,0.6)'; this.style.background = '#f0f5ff'; });
+        usernameInput.addEventListener('blur', function() { this.style.borderColor = '#ddd'; this.style.background = '#f7f7f7'; });
       }
       if (pwdInput) {
-        pwdInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(233,69,96,0.6)'; this.style.background = 'rgba(255,255,255,0.15)'; this.style.boxShadow = '0 0 0 4px rgba(233,69,96,0.1)'; });
-        pwdInput.addEventListener('blur', function() { this.style.borderColor = ''; this.style.background = ''; this.style.boxShadow = ''; });
+        pwdInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(20,72,147,0.6)'; this.style.background = '#f0f5ff'; });
+        pwdInput.addEventListener('blur', function() { this.style.borderColor = '#ddd'; this.style.background = '#f7f7f7'; });
       }
       var confirmInput = document.getElementById('authConfirm');
       if (confirmInput) {
-        confirmInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(233,69,96,0.6)'; this.style.background = 'rgba(255,255,255,0.15)'; this.style.boxShadow = '0 0 0 4px rgba(233,69,96,0.1)'; });
-        confirmInput.addEventListener('blur', function() { this.style.borderColor = ''; this.style.background = ''; this.style.boxShadow = ''; });
+        confirmInput.addEventListener('focus', function() { this.style.borderColor = 'rgba(20,72,147,0.6)'; this.style.background = '#f0f5ff'; });
+        confirmInput.addEventListener('blur', function() { this.style.borderColor = '#ddd'; this.style.background = '#f7f7f7'; });
       }
       if (!hasAccount && pwdInput) {
         pwdInput.addEventListener('input', function() { updateStrength(pwdInput.value); });
       }
       authBtn.addEventListener('click', function() { doAction(); });
       if (usernameInput) {
-        usernameInput.addEventListener('keydown', function(e) {
-          if (e.key === 'Enter') pwdInput.focus();
-        });
+        usernameInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') pwdInput.focus(); });
       }
-      pwdInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') doAction();
-      });
+      pwdInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') doAction(); });
       function updateStrength(pwd) {
         var bar = document.getElementById('strengthBar');
         var label = document.getElementById('strengthLabel');
         if (!bar || !label) return;
         var result = C.getPasswordStrengthLabel(pwd);
-        var score = result.score;
-        var maxScore = 6;
-        var percent = Math.min(100, (score / maxScore) * 100);
+        var percent = Math.min(100, (result.score / 6) * 100);
         bar.style.width = percent + '%';
         bar.style.backgroundColor = result.color;
         label.textContent = result.label;
@@ -363,17 +325,14 @@ function renderLocalAuth(App, S, C, U) {
           } else {
             remainingAttempts--;
             try { localStorage.setItem('jys_auth_attempts', remainingAttempts); } catch (ex) {}
-            if (attemptHint) {
-              if (remainingAttempts <= 0) {
-                var lockEnd = Date.now() + LOCK_DURATION;
-                try { localStorage.setItem('jys_auth_lock_end', lockEnd); } catch (ex) {}
-                U.showToast('账户已锁定30分钟', 'warn');
-                JYS.Pages.auth();
-              } else {
-                attemptHint.style.display = 'block';
-                attemptHint.textContent = '剩余尝试次数: ' + remainingAttempts + ' 次';
-                showError('密码错误');
-              }
+            if (remainingAttempts <= 0) {
+              var lockEndTime = Date.now() + LOCK_DURATION;
+              try { localStorage.setItem('jys_auth_lock_end', lockEndTime); } catch (ex) {}
+              U.showToast('账户已锁定30分钟', 'warn');
+              JYS.Pages.auth();
+            } else {
+              if (attemptHint) { attemptHint.style.display = 'block'; attemptHint.textContent = '剩余尝试次数: ' + remainingAttempts + ' 次'; }
+              showError('密码错误');
             }
             if (navigator.vibrate) navigator.vibrate(100);
           }
@@ -398,16 +357,10 @@ function renderLocalAuth(App, S, C, U) {
         }
       }
       function showError(msg) {
-        if (authError) {
-          authError.style.display = 'block';
-          authError.innerHTML = '<span class="error-icon">⚠️</span>' + U.escapeHtml(msg);
-        }
+        if (authError) { authError.style.display = 'flex'; authError.innerHTML = '<span class="error-icon">⚠️</span>' + U.escapeHtml(msg); }
       }
       function clearLockState() {
-        try {
-          localStorage.removeItem('jys_auth_attempts');
-          localStorage.removeItem('jys_auth_lock_end');
-        } catch (e) {}
+        try { localStorage.removeItem('jys_auth_attempts'); localStorage.removeItem('jys_auth_lock_end'); } catch (e) {}
         remainingAttempts = MAX_ATTEMPTS;
         if (attemptHint) attemptHint.style.display = 'none';
       }
