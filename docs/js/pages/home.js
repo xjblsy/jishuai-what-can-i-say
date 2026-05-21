@@ -91,7 +91,7 @@ JYS.Pages.home = function(params) {
       contentHTML = '<div class="content-list">';
       recentContents.forEach(function(item) {
         contentHTML +=
-          '<div class="content-item fade-in" data-id="' + item.id + '" data-character-id="' + item.characterId + '" onclick="JYS.Pages._goContentEdit(\'' + item.id + '\',\'' + item.characterId + '\')">' +
+          '<div class="content-item fade-in" data-id="' + item.id + '" data-character-id="' + item.characterId + '" onclick="JYS.Pages._goContentEdit(\'' + U.escapeJsStr(item.id) + '\',\'' + U.escapeJsStr(item.characterId) + '\')">' +
           '<div class="content-item-header">' +
           '<div class="item-avatar">' +
           (item.characterAvatar ? '<img class="avatar-img" src="' + U.escapeHtml(item.characterAvatar) + '" alt="" />' :
@@ -104,7 +104,7 @@ JYS.Pages.home = function(params) {
         if (item.images && item.images.length > 0) {
           contentHTML += '<div class="content-item-images">';
           item.images.forEach(function(img, i) {
-            contentHTML += '<div class="content-item-image" onclick="event.stopPropagation();JYS.Pages._previewImg(\'' + U.escapeHtml(img) + '\')"><img class="image" src="' + U.escapeHtml(img) + '" alt="" /></div>';
+            contentHTML += '<div class="content-item-image" onclick="event.stopPropagation();JYS.Pages._previewImg(\'' + U.escapeJsStr(img) + '\')"><img class="image" src="' + U.escapeHtml(img) + '" alt="" /></div>';
           });
           contentHTML += '</div>';
         }
@@ -115,8 +115,8 @@ JYS.Pages.home = function(params) {
         }
         contentHTML +=
           '<div class="content-item-footer">' +
-          '<span class="footer-action' + (item.isFavorite ? ' active' : '') + '" onclick="event.stopPropagation();JYS.Pages._toggleFavHome(\'' + item.id + '\')">' + (item.isFavorite ? '⭐ 收藏' : '☆ 收藏') + '</span>' +
-          '<span class="footer-action" onclick="event.stopPropagation();JYS.Pages._shareContent(\'' + item.id + '\')">分享</span>' +
+          '<span class="footer-action' + (item.isFavorite ? ' active' : '') + '" onclick="event.stopPropagation();JYS.Pages._toggleFavHome(\'' + U.escapeJsStr(item.id) + '\')">' + (item.isFavorite ? '⭐ 收藏' : '☆ 收藏') + '</span>' +
+          '<span class="footer-action" onclick="event.stopPropagation();JYS.Pages._shareContent(\'' + U.escapeJsStr(item.id) + '\')">分享</span>' +
           '</div></div>';
       });
       contentHTML += '</div>';
@@ -262,7 +262,10 @@ JYS.Pages._previewImg = function(url) {
   overlay.className = 'img-preview-overlay';
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-label', '图片预览');
-  overlay.innerHTML = '<img src="' + url + '" alt="" />';
+  var img = document.createElement('img');
+  img.src = url;
+  img.alt = '';
+  overlay.appendChild(img);
   var escHandler = function(e) { if (e.key === 'Escape') closePreview(); };
   var closePreview = function() {
     document.body.removeChild(overlay);

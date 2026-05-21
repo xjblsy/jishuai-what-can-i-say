@@ -162,7 +162,7 @@ JYS.Pages.search = function(params) {
               if (item.images && item.images.length > 0) {
                 contHTML += '<div class="item-images">';
                 item.images.forEach(function(img) {
-                  contHTML += '<div class="item-image"><img class="image" src="' + U.escapeHtml(img) + '" alt="" onclick="JYS.Pages._previewImg(\'' + U.escapeHtml(img) + '\')" /></div>';
+                  contHTML += '<div class="item-image"><img class="image" src="' + U.escapeHtml(img) + '" alt="" onclick="JYS.Pages._previewImg(\'' + U.escapeJsStr(img) + '\')" /></div>';
                 });
                 contHTML += '</div>';
               }

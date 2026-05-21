@@ -26,9 +26,20 @@ JYS.App = {
   MAX_RETRY_COUNT: 3,
   RETRY_DELAY_MS: 1000,
 
+  _ensureModules: function() {
+    if (!JYS.Util || !JYS.Storage || !JYS.Image || !JYS.Pages) {
+      console.error('[集英社] 核心模块加载失败');
+      return false;
+    }
+    return true;
+  },
+
   init: function() {
     var self = this;
-
+    if (!this._ensureModules()) {
+      document.getElementById('app').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">模块加载失败</div><div class="empty-sub">请刷新页面后重试</div><button class="empty-btn" onclick="location.reload()">刷新页面</button></div>';
+      return;
+    }
     window.addEventListener('error', function(e) {
       if (e.target === window || e.target === document) {
         console.error('[集英社] 未捕获错误:', e.message, e.filename, e.lineno);
@@ -364,24 +375,26 @@ JYS.App = {
   },
 
   route: function() {
-    var hash = window.location.hash || '#/home';
-    var path = hash.replace('#', '');
-
-    if (!this.checkAuth() && path !== '/auth') {
-      window.location.hash = '#/auth';
-      return;
+    try {
+      var hash = window.location.hash || '#/home';
+      var path = hash.replace('#', '');
+      if (!this.checkAuth() && path !== '/auth') {
+        window.location.hash = '#/auth';
+        return;
+      }
+      if (this.checkAuth() && path === '/auth') {
+        window.location.hash = '#/home';
+        return;
+      }
+      this._cleanupCurrentPage();
+      var page = this.parsePath(path);
+      this._currentPage = page.name;
+      this.renderPage(page.name, page.params);
+    } catch (e) {
+      console.error('[集英社] 路由异常:', e.message);
+      var appEl = document.getElementById('app');
+      if (appEl) appEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">页面导航失败</div><div class="empty-sub">请刷新页面后重试</div><button class="empty-btn" onclick="location.reload()">刷新页面</button></div>';
     }
-
-    if (this.checkAuth() && path === '/auth') {
-      window.location.hash = '#/home';
-      return;
-    }
-
-    this._cleanupCurrentPage();
-
-    var page = this.parsePath(path);
-    this._currentPage = page.name;
-    this.renderPage(page.name, page.params);
   },
 
   parsePath: function(path) {

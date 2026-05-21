@@ -635,9 +635,10 @@ JYS.Storage = {
       var chars = (data.characters || []).map(function(c) {
         return {
           name: c.name,
-          name_pinyin: c.namePinyin || '',
+          nickname: c.nickname || c.namePinyin || '',
+          remark: c.remark || c.description || '',
           avatar: c.avatar || '',
-          description: c.description || '',
+          description: c.description || c.remark || '',
           category: c.category || '',
           extra_1: c.extra1 || '',
           extra_2: c.extra2 || '',

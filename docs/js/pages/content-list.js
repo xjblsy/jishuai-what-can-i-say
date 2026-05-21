@@ -35,7 +35,7 @@ JYS.Pages.contentList = function(params) {
 
     var charChips = '<span class="character-chip active" data-id="">全部</span>';
     characters.forEach(function(c) {
-      var avatarHTML = c.avatar ? '<img class="avatar-img" src="' + U.escapeHtml(c.avatar) + '" alt="" />' : '<span class="avatar-text" style="font-size:18rpx;color:#999">' + U.escapeHtml(c.name[0]) + '</span>';
+      var avatarHTML = c.avatar ? '<img class="avatar-img" src="' + U.escapeHtml(c.avatar) + '" alt="" />' : '<span class="avatar-text" style="font-size:12px;color:#999">' + U.escapeHtml(c.name[0]) + '</span>';
       charChips += '<span class="character-chip" data-id="' + c.id + '"><span class="chip-avatar">' + avatarHTML + '</span>' + U.escapeHtml(c.name) + '</span>';
     });
 
@@ -57,7 +57,7 @@ JYS.Pages.contentList = function(params) {
       if (item.images && item.images.length > 0) {
         contentHTML += '<div class="card-images">';
         item.images.forEach(function(img) {
-          contentHTML += '<div class="card-image"><img class="image" src="' + U.escapeHtml(img) + '" alt="" onclick="JYS.Pages._previewImg(\'' + U.escapeHtml(img) + '\')" /></div>';
+          contentHTML += '<div class="card-image"><img class="image" src="' + U.escapeHtml(img) + '" alt="" onclick="JYS.Pages._previewImg(\'' + U.escapeJsStr(img) + '\')" /></div>';
         });
         contentHTML += '</div>';
       }

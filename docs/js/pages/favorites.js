@@ -56,7 +56,7 @@ JYS.Pages.favorites = function(params) {
       if (item.images && item.images.length > 0) {
         contentHTML += '<div class="item-images">';
         item.images.forEach(function(img) {
-          contentHTML += '<div class="item-image"><img class="image" src="' + U.escapeHtml(img) + '" alt="" onclick="JYS.Pages._previewImg(\'' + U.escapeHtml(img) + '\')" /></div>';
+          contentHTML += '<div class="item-image"><img class="image" src="' + U.escapeHtml(img) + '" alt="" onclick="JYS.Pages._previewImg(\'' + U.escapeJsStr(img) + '\')" /></div>';
         });
         contentHTML += '</div>';
       }

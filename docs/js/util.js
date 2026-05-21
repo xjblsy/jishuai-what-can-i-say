@@ -47,6 +47,14 @@ JYS.Util = {
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
   },
+  escapeJsStr: function(text) {
+    if (!text && text !== 0) return '';
+    return String(text)
+      .replace(/\\/g, '\\\\')
+      .replace(/'/g, "\\'")
+      .replace(/\n/g, '\\n')
+      .replace(/\r/g, '\\r');
+  },
 
   sanitizeInput: function(text) {
     if (!text) return '';
