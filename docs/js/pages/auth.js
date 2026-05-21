@@ -54,7 +54,7 @@ function renderSimpleAuth(App, U) {
       '剩余尝试次数: ' + remainingAttempts + ' 次' +
       '</div>' +
       '</div>' +
-      '<div class="auth-footer"><span>集英社 v2.1</span></div>' +
+      '<div class="auth-footer"><span>集英社 v2.1.1 · 安全访问</span></div>' +
       '</div>' +
       '</div>',
     onRender: function() {
